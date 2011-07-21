@@ -5,6 +5,7 @@
 #include "ast_decl.h"
 #include "ast_type.h"
 #include "ast_stmt.h"
+#include "errors.h"
 
 Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
     Assert(n != NULL);
@@ -58,5 +59,22 @@ void FnDecl::SetFunctionBody(Stmt *b) {
 }
 
 void FnDecl::Check(List<List<Decl*>*> *scopeList) {
-    return; /* TODO: Add Implementation */
+    List<Decl*> *curScope = scopeList->Nth(scopeList->NumElements()-1);
+
+    for (int i = 0, numElems = curScope->NumElements(); i < numElems; ++i) {
+        Decl* d = curScope->Nth(i);
+
+        /* If this Decl is already in declared in the current scope, report the
+         * error and return
+         */
+        if (*this == *d) {
+            ReportError::DeclConflict(this, d);
+            return;
+        }
+    }
+
+    /* If we've made it this far, this Decl must not already be declared in the
+     * current scope. Thus, append it to the current scope.
+     */
+    curScope->Append(this);
 }
