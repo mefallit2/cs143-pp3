@@ -23,6 +23,7 @@ class Program : public Node
 {
   protected:
      List<Decl*> *decls;
+     List<List<Decl*>*> *scope;
 
   public:
      Program(List<Decl*> *declList);
