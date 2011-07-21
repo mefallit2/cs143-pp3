@@ -11,6 +11,9 @@ Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
     (id=n)->SetParent(this);
 }
 
+bool Decl::operator==(const Decl &rhs) {
+    return *id == *rhs.id;
+}
 
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);

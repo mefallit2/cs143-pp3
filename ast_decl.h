@@ -29,6 +29,7 @@ class Decl : public Node
   public:
     Decl(Identifier *name);
     friend ostream& operator<<(ostream& out, Decl *d) { return out << d->id; }
+    bool operator==(const Decl &rhs);
 };
 
 class VarDecl : public Decl
