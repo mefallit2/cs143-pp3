@@ -22,6 +22,8 @@ void Program::Check() {
      *      checking itself, which makes for a great use of inheritance
      *      and polymorphism in the node classes.
      */
+    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
+        decls->Nth(i)->Check(scope);
 }
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
