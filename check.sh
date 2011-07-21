@@ -2,12 +2,15 @@
 
 [ -x dcc ] || { echo "Error: dcc not executable"; exit 1; }
 
+DIR=${1:-"samples"}
+shift
+
 LIST=
 if [ "$#" = "0" ]; then
-	LIST=`ls samples/*.out`
+	LIST=`ls $DIR/*.out`
 else
 	for test in "$@"; do
-		LIST="$LIST samples/$test.out"
+		LIST="$LIST $DIR/$test.out"
 	done
 fi
 
