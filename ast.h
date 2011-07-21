@@ -44,23 +44,21 @@ class Node  {
     Node(yyltype loc);
     Node();
     virtual ~Node() {}
-    
+
     yyltype *GetLocation()   { return location; }
     void SetParent(Node *p)  { parent = p; }
     Node *GetParent()        { return parent; }
 };
-   
 
 class Identifier : public Node 
 {
   protected:
     char *name;
-    
+
   public:
     Identifier(yyltype loc, const char *name);
     friend ostream& operator<<(ostream& out, Identifier *id) { return out << id->name; }
 };
-
 
 // This node class is designed to represent a portion of the tree that 
 // encountered syntax errors during parsing. The partial completed tree
@@ -72,7 +70,5 @@ class Error : public Node
   public:
     Error() : Node() {}
 };
-
-
 
 #endif
