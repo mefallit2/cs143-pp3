@@ -11,10 +11,13 @@ Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
     (id=n)->SetParent(this);
 }
 
-
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
+}
+
+void VarDecl::Check(List<List<Decl*>*> *scopeList) {
+    return; /* TODO: Add Implementation */
 }
 
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
@@ -26,10 +29,17 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members=m)->SetParentAll(this);
 }
 
+void ClassDecl::Check(List<List<Decl*>*> *scopeList) {
+    return; /* TODO: Add Implementation */
+}
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     Assert(n != NULL && m != NULL);
     (members=m)->SetParentAll(this);
+}
+
+void InterfaceDecl::Check(List<List<Decl*>*> *scopeList) {
+    return; /* TODO: Add Implementation */
 }
 
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
@@ -41,4 +51,8 @@ FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
 
 void FnDecl::SetFunctionBody(Stmt *b) {
     (body=b)->SetParent(this);
+}
+
+void FnDecl::Check(List<List<Decl*>*> *scopeList) {
+    return; /* TODO: Add Implementation */
 }
