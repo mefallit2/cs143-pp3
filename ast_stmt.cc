@@ -7,9 +7,11 @@
 #include "ast_decl.h"
 #include "ast_expr.h"
 
-Program::Program(List<Decl*> *d) {
+Program::Program(List<Decl*> *d) : scope(new List<List<Decl*>*>) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
+
+    scope->Append(new List<Decl*>); // Add initial empty global scope
 }
 
 void Program::Check() {
