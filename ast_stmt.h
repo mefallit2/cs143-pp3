@@ -28,6 +28,13 @@ class Program : public Node
   public:
      Program(List<Decl*> *declList);
      void Check();
+
+#ifdef DEBUG
+     /* For debugging purposes. This allows the current scope to be printed at
+      * any point in program execution by calling Program::PrintScope
+      */
+     static void PrintScope();
+#endif
 };
 
 class Stmt : public Node

@@ -7,11 +7,19 @@
 #include "ast_decl.h"
 #include "ast_expr.h"
 
+#ifdef DEBUG
+List<List<Decl*>*> *debugScope = NULL;
+#endif
+
 Program::Program(List<Decl*> *d) : scope(new List<List<Decl*>*>) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
 
     scope->Append(new List<Decl*>); // Add initial empty global scope
+
+#ifdef DEBUG
+    debugScope = scope;
+#endif
 }
 
 void Program::Check() {
@@ -25,6 +33,18 @@ void Program::Check() {
     for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
         decls->Nth(i)->Check(scope);
 }
+
+#ifdef DEBUG
+void Program::PrintScope() {
+    for (int i = 0, numScopes = debugScope->NumElements(); i < numScopes; ++i) {
+        std::cout << "========== Scope ==========" << std::endl;
+
+        List<Decl*> *s = debugScope->Nth(i);
+        for (int j = 0, numElems = s->NumElements(); j < numElems; ++j)
+            std::cout << s->Nth(j) << std::endl;
+    }
+}
+#endif
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
