@@ -6,6 +6,7 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 #include "ast_expr.h"
+#include "errors.h"
 #include "assert.h"
 
 #ifdef DEBUG
@@ -59,6 +60,43 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
     (stmts=s)->SetParentAll(this);
+}
+
+void StmtBlock::Check(List<List<Decl*>*> *scopeList) {
+    List<Decl*> *blockScope = new List<Decl*>;
+
+    /* In order to ensure the variable declarations contained in a StmtBlock
+     * are unique, each new Decl needs to be checked against the Decl's
+     * already in scope to ensure the requested identifier is not already
+     * taken.
+     */
+    for (int i = 0, numElems = decls->NumElements(); i < numElems; ++i) {
+        Decl *blockDecl = decls->Nth(i);
+
+        for (int j = 0, numScope = blockScope->NumElements(); j < numScope; ++j) {
+            Decl *blockScopeDecl = blockScope->Nth(j);
+
+            /* If the requested block declaration is already in the block
+             * scope, the identifiers must not be unique. Thus, report the
+             * error and return.
+             */
+            if (*blockDecl == *blockScopeDecl) {
+                ReportError::DeclConflict(blockDecl, blockScopeDecl);
+                return;
+            }
+        }
+
+        /* If we've made it this far, the requested block declaration must be
+         * available. Thus add it to the block scope.
+         */
+        blockScope->Append(blockDecl);
+    }
+
+    /* If we've made it this far, the block variable declarations do not vilate
+     * any Decaf scope rules.
+     */
+
+    scopeList->Append(blockScope); // Add the block scope to the scope list
 }
 
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {

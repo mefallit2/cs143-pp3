@@ -53,6 +53,7 @@ class StmtBlock : public Stmt
 
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
+    void Check(List<List<Decl*>*> *scopeList);
 };
 
 class ConditionalStmt : public Stmt

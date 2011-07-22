@@ -121,4 +121,6 @@ void FnDecl::Check(List<List<Decl*>*> *scopeList) {
 
     curScope->Append(this);         // Add this FnDecl to the current scope
     scopeList->Append(formalScope); // Add the formals list to the scope list
+
+    body->Check(scopeList);
 }
