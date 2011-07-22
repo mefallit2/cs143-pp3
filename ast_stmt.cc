@@ -97,6 +97,7 @@ void StmtBlock::Check(List<List<Decl*>*> *scopeList) {
      */
 
     scopeList->Append(blockScope); // Add the block scope to the scope list
+    scopeList->RemoveAt(scopeList->NumElements()-1); // Pop off block scope
 }
 
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {

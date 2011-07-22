@@ -123,4 +123,6 @@ void FnDecl::Check(List<List<Decl*>*> *scopeList) {
     scopeList->Append(formalScope); // Add the formals list to the scope list
 
     body->Check(scopeList);
+
+    scopeList->RemoveAt(scopeList->NumElements()-1); // Pop off formals list
 }
