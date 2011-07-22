@@ -73,8 +73,52 @@ void FnDecl::Check(List<List<Decl*>*> *scopeList) {
         }
     }
 
-    /* If we've made it this far, this Decl must not already be declared in the
-     * current scope. Thus, append it to the current scope.
+    /* Now that we know the function name has not been declared elsewhere, we
+     * can begin to process its formals, return type, and body.
      */
-    curScope->Append(this);
+
+    /* Decaf Specification (p6):
+     * Formal parameters are declared in a separate scope from the function's
+     * local variables (thus, a local variable can shadow a parmeter).
+     *
+     * Create a new list of Decls to hold the scope created by formals.
+     */
+    List<Decl*> *formalScope = new List<Decl*>;
+
+    /* Decaf Specification (p6):
+     * Identifiers used in the formal parameter list must be distinct.
+     *
+     * In order to ensure formal parameters are distinct, before a formal
+     * variable declaration is added to the formal scope, it needs to be
+     * checked against the Decls already in scope to ensure the requested
+     * identifier is not already taken.
+     */
+    for (int i = 0, numElems = formals->NumElements(); i < numElems; ++i) {
+        Decl *formalDecl = formals->Nth(i);
+
+        for (int j = 0, numScope = formalScope->NumElements(); j < numScope; ++j) {
+            Decl *formalScopeDecl = formalScope->Nth(j);
+
+            /* If the requested formal declaration is already in the formal
+             * scope, the identifiers must not be unique. Thus, report the
+             * error and return.
+             */
+            if (*formalDecl == *formalScopeDecl) {
+                ReportError::DeclConflict(formalDecl, formalScopeDecl);
+                return;
+            }
+        }
+
+        /* If we've made it this far, the requested formal variable declaration
+         * must be available. Thus, add it to the formal scope.
+         */
+        formalScope->Append(formalDecl);
+    }
+
+    /* If we've made it this far, this FnDecl identifier and its formals do not
+     * violate any Decaf scope rules.
+     */
+
+    curScope->Append(this);         // Add this FnDecl to the current scope
+    scopeList->Append(formalScope); // Add the formals list to the scope list
 }
