@@ -42,6 +42,7 @@ class Stmt : public Node
   public:
      Stmt() : Node() {}
      Stmt(yyltype loc) : Node(loc) {}
+     virtual void Check(List<List<Decl*>*> *scopeList);
 };
 
 class StmtBlock : public Stmt

@@ -6,6 +6,7 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 #include "ast_expr.h"
+#include "assert.h"
 
 #ifdef DEBUG
 List<List<Decl*>*> *debugScope = NULL;
@@ -45,6 +46,14 @@ void Program::PrintScope() {
     }
 }
 #endif
+
+void Stmt::Check(List<List<Decl*>*> *scopeList) {
+    /* This method should not be called. Any Check calls should fall through
+     * to each subclasses Check method.
+     */
+    assert(0);
+    return;
+}
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
