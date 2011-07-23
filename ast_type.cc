@@ -38,6 +38,15 @@ void NamedType::ReportNotDeclaredIdentifier() {
     ReportError::IdentifierNotDeclared(id, LookingForType);
 }
 
+bool NamedType::IsEqualTo(Type *other) {
+    NamedType *namedOther = dynamic_cast<NamedType*>(other);
+
+    if (namedOther == NULL)
+        return Type::IsEqualTo(other);
+    else
+        return *id == *(namedOther->id);
+}
+
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != NULL);
     (elemType=et)->SetParent(this);

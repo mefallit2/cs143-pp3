@@ -46,6 +46,7 @@ class Program : public Node
      void Check();
 
      static int CheckType(Type *type, List<Type*> *typeList);
+     static int AddUniqType(Type *type, List<Type*> *typeList);
 };
 
 class Stmt : public Node

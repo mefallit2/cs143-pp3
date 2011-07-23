@@ -46,6 +46,17 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
     (members=m)->SetParentAll(this);
 }
 
+int ClassDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
+    Scope *global = scopeList->Nth(0);
+
+    if (global->AddUniqDecl(this) != 0)
+        return 1;
+
+    if (Program::AddUniqType(new NamedType(id), typeList) != 0)
+        return 1;
+
+    return 0;
+}
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     Assert(n != NULL && m != NULL);

@@ -8,6 +8,7 @@
 #include "ast_expr.h"
 #include "errors.h"
 #include "ast_type.h"
+#include "assert.h"
 
 int Scope::AddUniqDecl(Decl *d) {
     for (int i = 0, n = scope->NumElements(); i < n; ++i) {
@@ -81,6 +82,19 @@ int Program::CheckType(Type *type, List<Type*> *typeList) {
 
     type->ReportNotDeclaredIdentifier();
     return 1;
+}
+
+int Program::AddUniqType(Type *type, List<Type*> *typeList) {
+    for (int i = 0, n = typeList->NumElements(); i < n; ++i) {
+        if (type->IsEqualTo(typeList->Nth(i))) {
+            // Please don't try to add types already contained in list.
+            assert(0);
+            return 1;
+        }
+    }
+
+    typeList->Append(type);
+    return 0;
 }
 
 int Stmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {

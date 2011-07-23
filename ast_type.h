@@ -31,7 +31,8 @@ class Type : public Node
 
     virtual void PrintToStream(ostream& out) { out << typeName; }
     friend ostream& operator<<(ostream& out, Type *t) { t->PrintToStream(out); return out; }
-    virtual bool IsEquivalentTo(Type *other) { return this == other; }
+    virtual bool IsEqualTo(Type *other) { return this == other; }
+    virtual bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
     virtual void ReportNotDeclaredIdentifier() { return; }
 };
 
@@ -45,6 +46,8 @@ class NamedType : public Type
 
     void PrintToStream(ostream& out) { out << id; }
     void ReportNotDeclaredIdentifier();
+    bool IsEqualTo(Type *other);
+    bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
 };
 
 class ArrayType : public Type
