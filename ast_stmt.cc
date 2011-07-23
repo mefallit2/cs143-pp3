@@ -8,7 +8,6 @@
 #include "ast_expr.h"
 #include "errors.h"
 #include "ast_type.h"
-#include "assert.h"
 
 int Scope::AddUniqDecl(Decl *d) {
     for (int i = 0, n = scope->NumElements(); i < n; ++i) {
@@ -70,6 +69,13 @@ void Program::Check() {
      *      checking itself, which makes for a great use of inheritance
      *      and polymorphism in the node classes.
      */
+
+    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++) {
+        ClassDecl *cd = dynamic_cast<ClassDecl*>(decls->Nth(i));
+        if (cd != NULL)
+            cd->AddToTypeList(typeList);
+    }
+
     for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
         decls->Nth(i)->Check(scopeList, typeList);
 }
@@ -110,8 +116,6 @@ int Program::CheckInterface(NamedType *type, List<Type*> *typeList) {
 int Program::AddUniqType(Type *type, List<Type*> *typeList) {
     for (int i = 0, n = typeList->NumElements(); i < n; ++i) {
         if (type->IsEqualTo(typeList->Nth(i))) {
-            // Please don't try to add types already contained in list.
-            assert(0);
             return 1;
         }
     }

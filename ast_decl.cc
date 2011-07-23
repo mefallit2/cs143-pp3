@@ -77,10 +77,11 @@ int ClassDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
 
     scopeList->RemoveAt(scopeList->NumElements()-1);
 
-    if (rc == 0)
-        rc = Program::AddUniqType(new NamedType(id), typeList);
-
     return rc;
+}
+
+int ClassDecl::AddToTypeList(List<Type*> *typeList) {
+    return Program::AddUniqType(new NamedType(id), typeList);
 }
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {

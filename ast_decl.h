@@ -56,6 +56,7 @@ class ClassDecl : public Decl
     ClassDecl(Identifier *name, NamedType *extends,
               List<NamedType*> *implements, List<Decl*> *members);
     int Check(List<Scope*> *scopeList, List<Type*> *typeList);
+    int AddToTypeList(List<Type*> *typeList);
 };
 
 class InterfaceDecl : public Decl
