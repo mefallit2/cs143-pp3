@@ -60,11 +60,11 @@ void Program::Check() {
         decls->Nth(i)->Check(scopeList);
 }
 
-void Stmt::Check(List<Scope*> *scopeList) {
+int Stmt::Check(List<Scope*> *scopeList) {
     /* TODO: Once all sublcasses support this function it should be made a pure
      * virtual function.
      */
-    return;
+    return 0;
 }
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
@@ -73,12 +73,14 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     (stmts=s)->SetParentAll(this);
 }
 
-void StmtBlock::Check(List<Scope*> *scopeList) {
+int StmtBlock::Check(List<Scope*> *scopeList) {
     Scope *blockScope = new Scope;
-    CheckDecls(blockScope);
+    if (CheckDecls(blockScope) != 0)
+        return 1;
     scopeList->Append(blockScope);
 
     scopeList->RemoveAt(scopeList->NumElements()-1);
+    return 0;
 }
 
 int StmtBlock::CheckDecls(Scope *blockScope) {
