@@ -19,6 +19,20 @@ class Decl;
 class VarDecl;
 class Expr;
 
+class Scope
+{
+  private:
+    List<Decl*> *scope;
+
+  public:
+    Scope() : scope(new List<Decl*>) {}
+
+    int AddUniqDecl(Decl *decl);
+    int RmUniqDecl(Decl *decl);
+
+    friend ostream& operator<<(ostream& out, Scope *s);
+};
+
 class Program : public Node
 {
   protected:

@@ -6,6 +6,41 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 #include "ast_expr.h"
+#include "errors.h"
+
+int Scope::AddUniqDecl(Decl *d) {
+    for (int i = 0, n = scope->NumElements(); i < n; ++i) {
+        Decl *nth = scope->Nth(i);
+
+        // If this Decl is already in declared, report the error
+        if (*nth == *d) {
+            ReportError::DeclConflict(d, nth);
+            return 1;
+        }
+    }
+
+    scope->Append(d);
+    return 0;
+}
+
+int Scope::RmUniqDecl(Decl *d) {
+    for (int i = 0, numElems = scope->NumElements(); i < numElems; ++i) {
+        Decl *nth = scope->Nth(i);
+
+        if (*nth == *d) {
+            scope->RemoveAt(i);
+            return 0;
+        }
+    }
+    return 1;
+}
+
+ostream& operator<<(ostream& out, Scope *s) {
+    out << "========== Scope ==========" << std::endl;
+    for (int i = 0, n = s->scope->NumElements(); i < n; ++i)
+        out << s->scope->Nth(i) << std::endl;
+    return out;
+}
 
 Program::Program(List<Decl*> *d) {
     Assert(d != NULL);
