@@ -41,6 +41,7 @@ class VarDecl : public Decl
 
   public:
     VarDecl(Identifier *name, Type *type);
+    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
     int Check(Scope *scope, List<Type*> *typeList);
 };
 

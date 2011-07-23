@@ -27,6 +27,11 @@ VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     (type=t)->SetParent(this);
 }
 
+int VarDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
+    Scope *top = scopeList->Nth(scopeList->NumElements()-1);
+    return Check(top, typeList);
+}
+
 int VarDecl::Check(Scope *scope, List<Type*> *typeList) {
     if (Program::CheckType(type, typeList))
         return 1;
