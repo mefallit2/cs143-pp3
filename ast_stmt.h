@@ -37,6 +37,7 @@ class Program : public Node
 {
   protected:
      List<Decl*> *decls;
+     List<Scope*> *scopeList;
 
   public:
      Program(List<Decl*> *declList);

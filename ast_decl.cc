@@ -15,6 +15,13 @@ bool Decl::operator==(const Decl &rhs) {
     return *id == *rhs.id;
 }
 
+void Decl::Check(List<Scope*> *scopeList) {
+    /* TODO: Once all subclasses support this function it should be made a pure
+     * virtual function.
+     */
+    return;
+}
+
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
@@ -44,4 +51,26 @@ FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
 
 void FnDecl::SetFunctionBody(Stmt *b) {
     (body=b)->SetParent(this);
+}
+
+void FnDecl::Check(List<Scope*> *scopeList) {
+    Scope *top = scopeList->Nth(scopeList->NumElements()-1);
+
+    if (top->AddUniqDecl(this) != 0)
+        return;
+
+    Scope *formalsScope = new Scope;
+    if (CheckFormals(formalsScope) != 0)
+        return;
+    scopeList->Append(formalsScope);
+
+    scopeList->RemoveAt(scopeList->NumElements()-1);
+}
+
+int FnDecl::CheckFormals(Scope *formalsScope) {
+    for (int i = 0, n = formals->NumElements(); i < n; ++i)
+        if (formalsScope->AddUniqDecl(formals->Nth(i)) != 0)
+            return 1;
+
+    return 0;
 }

@@ -42,9 +42,10 @@ ostream& operator<<(ostream& out, Scope *s) {
     return out;
 }
 
-Program::Program(List<Decl*> *d) {
+Program::Program(List<Decl*> *d) : scopeList(new List<Scope*>) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
+    scopeList->Append(new Scope); // Initial empty global scope
 }
 
 void Program::Check() {
@@ -55,6 +56,8 @@ void Program::Check() {
      *      checking itself, which makes for a great use of inheritance
      *      and polymorphism in the node classes.
      */
+    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
+        decls->Nth(i)->Check(scopeList);
 }
 
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
