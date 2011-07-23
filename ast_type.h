@@ -60,6 +60,9 @@ class ArrayType : public Type
     ArrayType(yyltype loc, Type *elemType);
 
     void PrintToStream(ostream& out) { out << elemType << "[]"; }
+    void ReportNotDeclaredIdentifier(reasonT reason);
+    bool IsEqualTo(Type *other);
+    bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
 };
 
 #endif

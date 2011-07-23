@@ -50,3 +50,16 @@ ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != NULL);
     (elemType=et)->SetParent(this);
 }
+
+void ArrayType::ReportNotDeclaredIdentifier(reasonT reason) {
+    elemType->ReportNotDeclaredIdentifier(reason);
+}
+
+bool ArrayType::IsEqualTo(Type *other) {
+    ArrayType *arrayOther = dynamic_cast<ArrayType*>(other);
+
+    if (arrayOther == NULL)
+        return Type::IsEqualTo(other);
+    else
+        return elemType->IsEqualTo(arrayOther->elemType);
+}
