@@ -66,6 +66,7 @@ class InterfaceDecl : public Decl
 
   public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
+    int AddToTypeList(List<Type*> *typeList);
 };
 
 class FnDecl : public Decl

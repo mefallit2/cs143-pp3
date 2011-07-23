@@ -71,9 +71,19 @@ void Program::Check() {
      */
 
     for (int i = 0, numElems = decls->NumElements(); i < numElems; i++) {
-        ClassDecl *cd = dynamic_cast<ClassDecl*>(decls->Nth(i));
-        if (cd != NULL)
+        Decl* d = decls->Nth(i);
+
+        ClassDecl *cd = dynamic_cast<ClassDecl*>(d);
+        if (cd != NULL) {
             cd->AddToTypeList(typeList);
+            continue;
+        }
+
+        InterfaceDecl *id = dynamic_cast<InterfaceDecl*>(d);
+        if (id != NULL) {
+            id->AddToTypeList(typeList);
+            continue;
+        }
     }
 
     for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)

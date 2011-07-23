@@ -89,6 +89,10 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     (members=m)->SetParentAll(this);
 }
 
+int InterfaceDecl::AddToTypeList(List<Type*> *typeList) {
+    return Program::AddUniqType(new NamedType(id), typeList);
+}
+
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
     Assert(n != NULL && r!= NULL && d != NULL);
     (returnType=r)->SetParent(this);
