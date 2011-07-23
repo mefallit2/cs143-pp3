@@ -66,6 +66,7 @@ class InterfaceDecl : public Decl
 
   public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
+    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
     int AddToTypeList(List<Type*> *typeList);
 };
 

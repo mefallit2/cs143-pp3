@@ -89,6 +89,21 @@ InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     (members=m)->SetParentAll(this);
 }
 
+int InterfaceDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
+    int rc = 0;
+
+    Scope *interfaceScope = new Scope;
+    scopeList->Append(interfaceScope);
+
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        if (members->Nth(i)->Check(scopeList, typeList))
+            rc = 1;
+
+    scopeList->RemoveAt(scopeList->NumElements()-1);
+
+    return rc;
+}
+
 int InterfaceDecl::AddToTypeList(List<Type*> *typeList) {
     return Program::AddUniqType(new NamedType(id), typeList);
 }
@@ -115,7 +130,8 @@ int FnDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
         return 1;
     scopeList->Append(formalsScope);
 
-    body->Check(scopeList, typeList);
+    if (body != NULL)
+        body->Check(scopeList, typeList);
 
     scopeList->RemoveAt(scopeList->NumElements()-1);
     return 0;
