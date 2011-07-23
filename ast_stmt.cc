@@ -60,10 +60,33 @@ void Program::Check() {
         decls->Nth(i)->Check(scopeList);
 }
 
+void Stmt::Check(List<Scope*> *scopeList) {
+    /* TODO: Once all sublcasses support this function it should be made a pure
+     * virtual function.
+     */
+    return;
+}
+
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
     (stmts=s)->SetParentAll(this);
+}
+
+void StmtBlock::Check(List<Scope*> *scopeList) {
+    Scope *blockScope = new Scope;
+    CheckDecls(blockScope);
+    scopeList->Append(blockScope);
+
+    scopeList->RemoveAt(scopeList->NumElements()-1);
+}
+
+int StmtBlock::CheckDecls(Scope *blockScope) {
+    for (int i = 0, n = decls->NumElements(); i < n; ++i)
+        if (blockScope->AddUniqDecl(decls->Nth(i)) != 0)
+            return 1;
+
+    return 0;
 }
 
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {

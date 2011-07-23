@@ -49,6 +49,7 @@ class Stmt : public Node
   public:
      Stmt() : Node() {}
      Stmt(yyltype loc) : Node(loc) {}
+     virtual void Check(List<Scope*> *scopeList);
 };
 
 class StmtBlock : public Stmt
@@ -59,6 +60,10 @@ class StmtBlock : public Stmt
 
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
+    void Check(List<Scope*> *scopeList);
+
+  private:
+    int CheckDecls(Scope *blockScope);
 };
 
 class ConditionalStmt : public Stmt

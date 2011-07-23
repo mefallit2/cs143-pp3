@@ -64,6 +64,8 @@ void FnDecl::Check(List<Scope*> *scopeList) {
         return;
     scopeList->Append(formalsScope);
 
+    body->Check(scopeList);
+
     scopeList->RemoveAt(scopeList->NumElements()-1);
 }
 
