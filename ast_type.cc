@@ -6,7 +6,6 @@
 #include <string.h>
 #include "ast_type.h"
 #include "ast_decl.h"
-#include "errors.h"
 
 /* Class constants
  * ---------------
@@ -34,8 +33,8 @@ NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
     (id=i)->SetParent(this);
 }
 
-void NamedType::ReportNotDeclaredIdentifier() {
-    ReportError::IdentifierNotDeclared(id, LookingForType);
+void NamedType::ReportNotDeclaredIdentifier(reasonT reason) {
+    ReportError::IdentifierNotDeclared(id, reason);
 }
 
 bool NamedType::IsEqualTo(Type *other) {

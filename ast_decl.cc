@@ -47,15 +47,24 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 }
 
 int ClassDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
+    int rc = 0;
+
     Scope *global = scopeList->Nth(0);
 
     if (global->AddUniqDecl(this) != 0)
-        return 1;
+        rc = 1;
 
-    if (Program::AddUniqType(new NamedType(id), typeList) != 0)
-        return 1;
+    if (extends != NULL && Program::CheckClass(extends, typeList) != 0)
+        rc = 1;
 
-    return 0;
+    for (int i = 0, n = implements->NumElements(); i < n; ++i)
+        if (Program::CheckInterface(implements->Nth(i), typeList) != 0)
+            rc = 1;
+
+    if (rc == 0)
+        rc = Program::AddUniqType(new NamedType(id), typeList);
+
+    return rc;
 }
 
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {

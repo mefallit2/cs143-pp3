@@ -15,6 +15,7 @@
 #include "ast.h"
 #include "list.h"
 #include <iostream>
+#include "errors.h"
 using namespace std;
 
 class Type : public Node
@@ -33,7 +34,7 @@ class Type : public Node
     friend ostream& operator<<(ostream& out, Type *t) { t->PrintToStream(out); return out; }
     virtual bool IsEqualTo(Type *other) { return this == other; }
     virtual bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
-    virtual void ReportNotDeclaredIdentifier() { return; }
+    virtual void ReportNotDeclaredIdentifier(reasonT reason) { return; }
 };
 
 class NamedType : public Type
@@ -45,7 +46,7 @@ class NamedType : public Type
     NamedType(Identifier *i);
 
     void PrintToStream(ostream& out) { out << id; }
-    void ReportNotDeclaredIdentifier();
+    void ReportNotDeclaredIdentifier(reasonT reason);
     bool IsEqualTo(Type *other);
     bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
 };

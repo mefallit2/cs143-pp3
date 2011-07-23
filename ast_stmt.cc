@@ -74,13 +74,36 @@ void Program::Check() {
         decls->Nth(i)->Check(scopeList, typeList);
 }
 
-int Program::CheckType(Type *type, List<Type*> *typeList) {
+bool Program::IsEquivalentTypeInList(Type *type, List<Type*> *typeList) {
     for (int i = 0, n = typeList->NumElements(); i < n; ++i) {
         if (type->IsEquivalentTo(typeList->Nth(i)))
-            return 0;
+            return true;
     }
 
-    type->ReportNotDeclaredIdentifier();
+    return false;
+}
+
+int Program::CheckType(Type *type, List<Type*> *typeList) {
+    if (IsEquivalentTypeInList(type, typeList))
+        return 0;
+
+    type->ReportNotDeclaredIdentifier(LookingForType);
+    return 1;
+}
+
+int Program::CheckClass(NamedType *type, List<Type*> *typeList) {
+    if (IsEquivalentTypeInList(type, typeList))
+        return 0;
+
+    type->ReportNotDeclaredIdentifier(LookingForClass);
+    return 1;
+}
+
+int Program::CheckInterface(NamedType *type, List<Type*> *typeList) {
+    if (IsEquivalentTypeInList(type, typeList))
+        return 0;
+
+    type->ReportNotDeclaredIdentifier(LookingForInterface);
     return 1;
 }
 

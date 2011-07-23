@@ -19,6 +19,7 @@ class Decl;
 class VarDecl;
 class Expr;
 class Type;
+class NamedType;
 
 class Scope
 {
@@ -46,7 +47,12 @@ class Program : public Node
      void Check();
 
      static int CheckType(Type *type, List<Type*> *typeList);
+     static int CheckClass(NamedType *type, List<Type*> *typeList);
+     static int CheckInterface(NamedType *type, List<Type*> *typeList);
      static int AddUniqType(Type *type, List<Type*> *typeList);
+
+  private:
+     static bool IsEquivalentTypeInList(Type *type, List<Type*> *typeList);
 };
 
 class Stmt : public Node
