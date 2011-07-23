@@ -31,7 +31,7 @@ class Decl : public Node
     Decl(Identifier *name);
     friend ostream& operator<<(ostream& out, Decl *d) { return out << d->id; }
     bool operator==(const Decl &rhs);
-    virtual int Check(List<Scope*> *scopeList);
+    virtual int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 };
 
 class VarDecl : public Decl
@@ -41,6 +41,7 @@ class VarDecl : public Decl
 
   public:
     VarDecl(Identifier *name, Type *type);
+    int Check(Scope *scope, List<Type*> *typeList);
 };
 
 class ClassDecl : public Decl
@@ -74,10 +75,10 @@ class FnDecl : public Decl
   public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);
-    int Check(List<Scope*> *scopeList);
+    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
   private:
-    int CheckFormals(Scope *formalsScope);
+    int CheckFormals(Scope *formalsScope, List<Type*> *typeList);
 };
 
 #endif

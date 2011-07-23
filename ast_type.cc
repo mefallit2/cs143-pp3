@@ -6,6 +6,7 @@
 #include <string.h>
 #include "ast_type.h"
 #include "ast_decl.h"
+#include "errors.h"
 
 /* Class constants
  * ---------------
@@ -31,6 +32,10 @@ Type::Type(const char *n) {
 NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
     Assert(i != NULL);
     (id=i)->SetParent(this);
+}
+
+void NamedType::ReportNotDeclaredIdentifier() {
+    ReportError::IdentifierNotDeclared(id, LookingForType);
 }
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {

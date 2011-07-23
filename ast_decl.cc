@@ -15,7 +15,7 @@ bool Decl::operator==(const Decl &rhs) {
     return *id == *rhs.id;
 }
 
-int Decl::Check(List<Scope*> *scopeList) {
+int Decl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     /* TODO: Once all subclasses support this function it should be made a pure
      * virtual function.
      */
@@ -25,6 +25,16 @@ int Decl::Check(List<Scope*> *scopeList) {
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
+}
+
+int VarDecl::Check(Scope *scope, List<Type*> *typeList) {
+    if (Program::CheckType(type, typeList))
+        return 1;
+
+    if (scope->AddUniqDecl(this))
+        return 1;
+
+    return 0;
 }
 
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
@@ -53,26 +63,26 @@ void FnDecl::SetFunctionBody(Stmt *b) {
     (body=b)->SetParent(this);
 }
 
-int FnDecl::Check(List<Scope*> *scopeList) {
+int FnDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     Scope *top = scopeList->Nth(scopeList->NumElements()-1);
 
     if (top->AddUniqDecl(this) != 0)
         return 1;
 
     Scope *formalsScope = new Scope;
-    if (CheckFormals(formalsScope) != 0)
+    if (CheckFormals(formalsScope, typeList) != 0)
         return 1;
     scopeList->Append(formalsScope);
 
-    body->Check(scopeList);
+    body->Check(scopeList, typeList);
 
     scopeList->RemoveAt(scopeList->NumElements()-1);
     return 0;
 }
 
-int FnDecl::CheckFormals(Scope *formalsScope) {
+int FnDecl::CheckFormals(Scope *formalsScope, List<Type*> *typeList) {
     for (int i = 0, n = formals->NumElements(); i < n; ++i)
-        if (formalsScope->AddUniqDecl(formals->Nth(i)) != 0)
+        if (formals->Nth(i)->Check(formalsScope, typeList))
             return 1;
 
     return 0;

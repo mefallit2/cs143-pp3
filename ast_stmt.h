@@ -18,6 +18,7 @@
 class Decl;
 class VarDecl;
 class Expr;
+class Type;
 
 class Scope
 {
@@ -38,10 +39,13 @@ class Program : public Node
   protected:
      List<Decl*> *decls;
      List<Scope*> *scopeList;
+     List<Type*> *typeList;
 
   public:
      Program(List<Decl*> *declList);
      void Check();
+
+     static int CheckType(Type *type, List<Type*> *typeList);
 };
 
 class Stmt : public Node
@@ -49,7 +53,7 @@ class Stmt : public Node
   public:
      Stmt() : Node() {}
      Stmt(yyltype loc) : Node(loc) {}
-     virtual int Check(List<Scope*> *scopeList);
+     virtual int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 };
 
 class StmtBlock : public Stmt
@@ -60,10 +64,10 @@ class StmtBlock : public Stmt
 
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
-    int Check(List<Scope*> *scopeList);
+    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
   private:
-    int CheckDecls(Scope *blockScope);
+    int CheckDecls(Scope *blockScope, List<Type*> *typeList);
 };
 
 class ConditionalStmt : public Stmt

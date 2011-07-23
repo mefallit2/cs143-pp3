@@ -7,6 +7,7 @@
 #include "ast_decl.h"
 #include "ast_expr.h"
 #include "errors.h"
+#include "ast_type.h"
 
 int Scope::AddUniqDecl(Decl *d) {
     for (int i = 0, n = scope->NumElements(); i < n; ++i) {
@@ -42,10 +43,22 @@ ostream& operator<<(ostream& out, Scope *s) {
     return out;
 }
 
-Program::Program(List<Decl*> *d) : scopeList(new List<Scope*>) {
+Program::Program(List<Decl*> *d) :
+scopeList(new List<Scope*>),
+typeList(new List<Type*>)
+{
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
     scopeList->Append(new Scope); // Initial empty global scope
+
+    // Append all primitive types
+    typeList->Append(Type::intType);
+    typeList->Append(Type::doubleType);
+    typeList->Append(Type::boolType);
+    typeList->Append(Type::voidType);
+    typeList->Append(Type::nullType);
+    typeList->Append(Type::stringType);
+    typeList->Append(Type::errorType);
 }
 
 void Program::Check() {
@@ -57,10 +70,20 @@ void Program::Check() {
      *      and polymorphism in the node classes.
      */
     for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
-        decls->Nth(i)->Check(scopeList);
+        decls->Nth(i)->Check(scopeList, typeList);
 }
 
-int Stmt::Check(List<Scope*> *scopeList) {
+int Program::CheckType(Type *type, List<Type*> *typeList) {
+    for (int i = 0, n = typeList->NumElements(); i < n; ++i) {
+        if (type->IsEquivalentTo(typeList->Nth(i)))
+            return 0;
+    }
+
+    type->ReportNotDeclaredIdentifier();
+    return 1;
+}
+
+int Stmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     /* TODO: Once all sublcasses support this function it should be made a pure
      * virtual function.
      */
@@ -73,9 +96,9 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     (stmts=s)->SetParentAll(this);
 }
 
-int StmtBlock::Check(List<Scope*> *scopeList) {
+int StmtBlock::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     Scope *blockScope = new Scope;
-    if (CheckDecls(blockScope) != 0)
+    if (CheckDecls(blockScope, typeList) != 0)
         return 1;
     scopeList->Append(blockScope);
 
@@ -83,9 +106,9 @@ int StmtBlock::Check(List<Scope*> *scopeList) {
     return 0;
 }
 
-int StmtBlock::CheckDecls(Scope *blockScope) {
+int StmtBlock::CheckDecls(Scope *blockScope, List<Type*> *typeList) {
     for (int i = 0, n = decls->NumElements(); i < n; ++i)
-        if (blockScope->AddUniqDecl(decls->Nth(i)) != 0)
+        if (decls->Nth(i)->Check(blockScope, typeList) != 0)
             return 1;
 
     return 0;
