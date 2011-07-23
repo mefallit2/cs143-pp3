@@ -33,13 +33,15 @@ int VarDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
 }
 
 int VarDecl::Check(Scope *scope, List<Type*> *typeList) {
+    int rc = 0;
+
     if (Program::CheckType(type, typeList))
-        return 1;
+        rc = 1;
 
     if (scope->AddUniqDecl(this))
-        return 1;
+        rc = 1;
 
-    return 0;
+    return rc;
 }
 
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
@@ -65,6 +67,15 @@ int ClassDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     for (int i = 0, n = implements->NumElements(); i < n; ++i)
         if (Program::CheckInterface(implements->Nth(i), typeList) != 0)
             rc = 1;
+
+    Scope *classScope = new Scope;
+    scopeList->Append(classScope);
+
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        if (members->Nth(i)->Check(scopeList, typeList))
+            rc = 1;
+
+    scopeList->RemoveAt(scopeList->NumElements()-1);
 
     if (rc == 0)
         rc = Program::AddUniqType(new NamedType(id), typeList);
