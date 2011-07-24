@@ -10,36 +10,28 @@
 #include "ast_type.h"
 
 int Scope::AddUniqDecl(Decl *d) {
-    for (int i = 0, n = scope->NumElements(); i < n; ++i) {
-        Decl *nth = scope->Nth(i);
+    Decl *lookup = scope->Lookup(d->Name());
 
-        // If this Decl is already in declared, report the error
-        if (*nth == *d) {
-            ReportError::DeclConflict(d, nth);
+    if (lookup != NULL) {
+            ReportError::DeclConflict(d, lookup);
             return 1;
-        }
     }
 
-    scope->Append(d);
+    scope->Enter(d->Name(), d);
     return 0;
 }
 
 int Scope::RmUniqDecl(Decl *d) {
-    for (int i = 0, numElems = scope->NumElements(); i < numElems; ++i) {
-        Decl *nth = scope->Nth(i);
-
-        if (*nth == *d) {
-            scope->RemoveAt(i);
-            return 0;
-        }
-    }
-    return 1;
+    scope->Remove(d->Name(), d);
+    return 0;
 }
 
 ostream& operator<<(ostream& out, Scope *s) {
     out << "========== Scope ==========" << std::endl;
-    for (int i = 0, n = s->scope->NumElements(); i < n; ++i)
-        out << s->scope->Nth(i) << std::endl;
+    Iterator<Decl*> iter = s->scope->GetIterator();
+    Decl *d;
+    while ((d = iter.GetNextValue()) != NULL)
+        out << d << std::endl;
     return out;
 }
 

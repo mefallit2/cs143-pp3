@@ -32,6 +32,7 @@ class Decl : public Node
     friend ostream& operator<<(ostream& out, Decl *d) { return out << d->id; }
     bool operator==(const Decl &rhs);
     virtual int Check(List<Scope*> *scopeList, List<Type*> *typeList);
+    const char* Name() { return id->Name(); }
 };
 
 class VarDecl : public Decl

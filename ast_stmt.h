@@ -14,6 +14,7 @@
 
 #include "list.h"
 #include "ast.h"
+#include "hashtable.h"
 
 class Decl;
 class VarDecl;
@@ -24,10 +25,10 @@ class NamedType;
 class Scope
 {
   private:
-    List<Decl*> *scope;
+    Hashtable<Decl*> *scope;
 
   public:
-    Scope() : scope(new List<Decl*>) {}
+    Scope() : scope(new Hashtable<Decl*>) {}
 
     int AddUniqDecl(Decl *decl);
     int RmUniqDecl(Decl *decl);

@@ -59,6 +59,7 @@ class Identifier : public Node
     Identifier(yyltype loc, const char *name);
     friend ostream& operator<<(ostream& out, Identifier *id) { return out << id->name; }
     bool operator==(const Identifier &rhs);
+    const char* Name() { return name; }
 };
 
 // This node class is designed to represent a portion of the tree that 
