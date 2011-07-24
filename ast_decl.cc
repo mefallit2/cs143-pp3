@@ -89,6 +89,11 @@ void ClassDecl::BuildScope(Scope *parent) {
 void ClassDecl::Check() {
     CheckExtends();
     CheckImplements();
+
+    for (int i = 0, n = implements->NumElements(); i < n; ++i)
+        CheckImplementedMembers(implements->Nth(i));
+
+    CheckExtendedMembers(extends);
 }
 
 void ClassDecl::CheckExtends() {
@@ -96,12 +101,8 @@ void ClassDecl::CheckExtends() {
         return;
 
     Decl *lookup = scope->GetParent()->table->Lookup(extends->Name());
-    ClassDecl *extDecl = dynamic_cast<ClassDecl*>(lookup);
-
-    if (extDecl == NULL)
+    if (dynamic_cast<ClassDecl*>(lookup) == NULL)
         extends->ReportNotDeclaredIdentifier(LookingForClass);
-    else
-        CheckExtendedMembers(extDecl);
 }
 
 void ClassDecl::CheckImplements() {
@@ -109,27 +110,32 @@ void ClassDecl::CheckImplements() {
 
     for (int i = 0, n = implements->NumElements(); i < n; ++i) {
         NamedType *nth = implements->Nth(i);
-        Decl *lookup = s->table->Lookup(nth->Name());
-        InterfaceDecl *intDecl = dynamic_cast<InterfaceDecl*>(lookup);
+        Decl *lookup = s->table->Lookup(implements->Nth(i)->Name());
 
-        if (intDecl == NULL)
+        if (dynamic_cast<InterfaceDecl*>(lookup) == NULL)
             nth->ReportNotDeclaredIdentifier(LookingForInterface);
-        else
-            CheckImplementedMembers(intDecl);
     }
 }
 
-void ClassDecl::CheckExtendedMembers(ClassDecl *extDecl) {
-    if (extDecl != NULL && extDecl->extends != NULL) {
-        Scope *s = extDecl->scope->GetParent();
-        Decl *lookup = s->table->Lookup(extDecl->extends->Name());
-        CheckExtendedMembers(dynamic_cast<ClassDecl*>(lookup));
-    }
+void ClassDecl::CheckExtendedMembers(NamedType *extType) {
+    if (extType == NULL)
+        return;
 
+    Decl *lookup = scope->GetParent()->table->Lookup(extType->Name());
+    ClassDecl *extDecl = dynamic_cast<ClassDecl*>(lookup);
+    if (extDecl == NULL)
+        return;
+
+    CheckExtendedMembers(extDecl->extends);
     CheckAgainstScope(extDecl->scope);
 }
 
-void ClassDecl::CheckImplementedMembers(InterfaceDecl *intDecl) {
+void ClassDecl::CheckImplementedMembers(NamedType *impType) {
+    Decl *lookup = scope->GetParent()->table->Lookup(impType->Name());
+    InterfaceDecl *intDecl = dynamic_cast<InterfaceDecl*>(lookup);
+    if (intDecl == NULL)
+        return;
+
     CheckAgainstScope(intDecl->GetScope());
 }
 

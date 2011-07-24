@@ -78,8 +78,8 @@ class ClassDecl : public Decl
     void CheckExtends();
     void CheckImplements();
 
-    void CheckExtendedMembers(ClassDecl *extDecl);
-    void CheckImplementedMembers(InterfaceDecl *intDecl);
+    void CheckExtendedMembers(NamedType *extType);
+    void CheckImplementedMembers(NamedType *impType);
     void CheckAgainstScope(Scope *other);
 };
 
