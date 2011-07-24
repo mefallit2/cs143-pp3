@@ -138,6 +138,11 @@ int Stmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     /* TODO: Once all sublcasses support this function it should be made a pure
      * virtual function.
      */
+
+    // Not quite sure why we are here and not in the subclass implementation
+    if (dynamic_cast<ConditionalStmt*>(this) != NULL)
+        (static_cast<ConditionalStmt*>(this))->Check(scopeList, typeList);
+
     return 0;
 }
 
