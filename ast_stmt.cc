@@ -9,26 +9,21 @@
 #include "errors.h"
 #include "ast_type.h"
 
-int Scope::AddUniqDecl(Decl *d) {
-    Decl *lookup = scope->Lookup(d->Name());
+int Scope::AddDecl(Decl *d) {
+    Decl *lookup = table->Lookup(d->Name());
 
     if (lookup != NULL) {
             ReportError::DeclConflict(d, lookup);
             return 1;
     }
 
-    scope->Enter(d->Name(), d);
-    return 0;
-}
-
-int Scope::RmUniqDecl(Decl *d) {
-    scope->Remove(d->Name(), d);
+    table->Enter(d->Name(), d);
     return 0;
 }
 
 ostream& operator<<(ostream& out, Scope *s) {
     out << "========== Scope ==========" << std::endl;
-    Iterator<Decl*> iter = s->scope->GetIterator();
+    Iterator<Decl*> iter = s->table->GetIterator();
     Decl *d;
     while ((d = iter.GetNextValue()) != NULL)
         out << d << std::endl;

@@ -38,7 +38,7 @@ int VarDecl::Check(Scope *scope, List<Type*> *typeList) {
     if (Program::CheckType(type, typeList))
         rc = 1;
 
-    if (scope->AddUniqDecl(this))
+    if (scope->AddDecl(this))
         rc = 1;
 
     return rc;
@@ -58,7 +58,7 @@ int ClassDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
 
     Scope *global = scopeList->Nth(0);
 
-    if (global->AddUniqDecl(this) != 0)
+    if (global->AddDecl(this) != 0)
         rc = 1;
 
     if (extends != NULL && Program::CheckClass(extends, typeList) != 0)
@@ -122,7 +122,7 @@ void FnDecl::SetFunctionBody(Stmt *b) {
 int FnDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     Scope *top = scopeList->Nth(scopeList->NumElements()-1);
 
-    if (top->AddUniqDecl(this) != 0)
+    if (top->AddDecl(this) != 0)
         return 1;
 
     Scope *formalsScope = new Scope;

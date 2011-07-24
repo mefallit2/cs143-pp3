@@ -24,15 +24,13 @@ class NamedType;
 
 class Scope
 {
-  private:
-    Hashtable<Decl*> *scope;
+  public:
+    Hashtable<Decl*> *table;
 
   public:
-    Scope() : scope(new Hashtable<Decl*>) {}
+    Scope() : table(new Hashtable<Decl*>) {}
 
-    int AddUniqDecl(Decl *decl);
-    int RmUniqDecl(Decl *decl);
-
+    int AddDecl(Decl *decl);
     friend ostream& operator<<(ostream& out, Scope *s);
 };
 
