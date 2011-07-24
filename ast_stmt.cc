@@ -148,13 +148,20 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
 }
 
 int StmtBlock::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
+    int rc = 0;
+
     Scope *blockScope = new Scope;
     if (CheckDecls(blockScope, typeList) != 0)
-        return 1;
+        rc = 1;
     scopeList->Append(blockScope);
 
+    for (int i = 0, n = stmts->NumElements(); i < n; ++i)
+        if (stmts->Nth(i)->Check(scopeList, typeList) != 0)
+            rc = 1;
+
     scopeList->RemoveAt(scopeList->NumElements()-1);
-    return 0;
+
+    return rc;
 }
 
 int StmtBlock::CheckDecls(Scope *blockScope, List<Type*> *typeList) {
@@ -169,6 +176,20 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     Assert(t != NULL && b != NULL);
     (test=t)->SetParent(this);
     (body=b)->SetParent(this);
+}
+
+int ConditionalStmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
+    int rc = 0;
+
+    Scope *bodyScope = new Scope;
+    scopeList->Append(bodyScope);
+
+    if (body->Check(scopeList, typeList) != 0)
+        rc = 1;
+
+    scopeList->RemoveAt(scopeList->NumElements()-1);
+
+    return rc;
 }
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {

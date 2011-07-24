@@ -85,6 +85,7 @@ class ConditionalStmt : public Stmt
 
   public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
+    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 };
 
 class LoopStmt : public ConditionalStmt
