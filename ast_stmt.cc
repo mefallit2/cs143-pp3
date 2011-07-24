@@ -231,6 +231,14 @@ int ConditionalStmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     return rc;
 }
 
+void ConditionalStmt::BuildScope(Scope *parent) {
+    body->BuildScope(parent);
+}
+
+void ConditionalStmt::Check() {
+    body->Check();
+}
+
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     Assert(i != NULL && t != NULL && s != NULL && b != NULL);
     (init=i)->SetParent(this);

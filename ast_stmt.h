@@ -103,6 +103,9 @@ class ConditionalStmt : public Stmt
   public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
     int Check(List<Scope*> *scopeList, List<Type*> *typeList);
+
+    void BuildScope(Scope *parent);
+    void Check();
 };
 
 class LoopStmt : public ConditionalStmt
@@ -125,6 +128,9 @@ class WhileStmt : public LoopStmt
 {
   public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
+
+    void BuildScope(Scope *parent) { ConditionalStmt::BuildScope(parent); }
+    void Check() { ConditionalStmt::Check(); }
 };
 
 class IfStmt : public ConditionalStmt
