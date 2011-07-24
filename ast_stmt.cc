@@ -153,6 +153,12 @@ void Stmt::BuildScope(Scope *parent) {
      */
 }
 
+void Stmt::Check() {
+    /* TODO: Once all sublcasses support this function it should be made a pure
+     * virtual function.
+     */
+}
+
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
@@ -187,6 +193,14 @@ void StmtBlock::BuildScope(Scope *parent) {
 
     for (int i = 0, n = stmts->NumElements(); i < n; ++i)
         stmts->Nth(i)->BuildScope(scope);
+}
+
+void StmtBlock::Check() {
+    for (int i = 0, n = decls->NumElements(); i < n; ++i)
+        decls->Nth(i)->Check();
+
+    for (int i = 0, n = stmts->NumElements(); i < n; ++i)
+        stmts->Nth(i)->Check();
 }
 
 int StmtBlock::CheckDecls(Scope *blockScope, List<Type*> *typeList) {

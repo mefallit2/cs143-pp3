@@ -67,14 +67,12 @@ void VarDecl::Check() {
 }
 
 void VarDecl::CheckType() {
-    NamedType *nt = dynamic_cast<NamedType*>(type);
-
-    if (nt == NULL)
+    if (type->IsPrimitive())
         return;
 
     Scope *s = scope;
     while (s != NULL) {
-        if (s->table->Lookup(nt->Name()) != NULL)
+        if (s->table->Lookup(type->Name()) != NULL)
             return;
         s = s->GetParent();
     }
@@ -238,6 +236,9 @@ void FnDecl::BuildScope(Scope *parent) {
 void FnDecl::Check() {
     for (int i = 0, n = formals->NumElements(); i < n; ++i)
         formals->Nth(i)->Check();
+
+    if (body)
+        body->Check();
 }
 
 int FnDecl::CheckFormals(Scope *formalsScope, List<Type*> *typeList) {

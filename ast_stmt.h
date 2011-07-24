@@ -74,6 +74,7 @@ class Stmt : public Node
      virtual int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
      virtual void BuildScope(Scope *parent);
+     virtual void Check();
 };
 
 class StmtBlock : public Stmt
@@ -87,6 +88,7 @@ class StmtBlock : public Stmt
     int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
+    void Check();
 
   private:
     int CheckDecls(Scope *blockScope, List<Type*> *typeList);

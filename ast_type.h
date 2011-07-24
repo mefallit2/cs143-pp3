@@ -35,6 +35,9 @@ class Type : public Node
     virtual bool IsEqualTo(Type *other) { return this == other; }
     virtual bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
     virtual void ReportNotDeclaredIdentifier(reasonT reason) { return; }
+
+    virtual const char* Name() { return typeName; }
+    virtual bool IsPrimitive() { return true; }
 };
 
 class NamedType : public Type
@@ -51,6 +54,7 @@ class NamedType : public Type
     bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
 
     const char* Name() { return id->Name(); }
+    bool IsPrimitive() { return false; }
 };
 
 class ArrayType : public Type
@@ -65,6 +69,9 @@ class ArrayType : public Type
     void ReportNotDeclaredIdentifier(reasonT reason);
     bool IsEqualTo(Type *other);
     bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
+
+    const char* Name() { return elemType->Name(); }
+    bool IsPrimitive() { return false; }
 };
 
 #endif
