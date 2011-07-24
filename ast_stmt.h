@@ -25,11 +25,13 @@ class NamedType;
 class Scope
 {
   public:
+    Scope *parent;
     Hashtable<Decl*> *table;
 
   public:
     Scope() : table(new Hashtable<Decl*>) {}
 
+    void SetParent(Scope *p) { parent = p; }
     int AddDecl(Decl *decl);
     friend ostream& operator<<(ostream& out, Scope *s);
 };
@@ -40,6 +42,8 @@ class Program : public Node
      List<Decl*> *decls;
      List<Scope*> *scopeList;
      List<Type*> *typeList;
+
+     Scope *scope;
 
   public:
      Program(List<Decl*> *declList);
@@ -52,6 +56,8 @@ class Program : public Node
 
   private:
      static bool IsEquivalentTypeInList(Type *type, List<Type*> *typeList);
+
+     void BuildScope();
 };
 
 class Stmt : public Node

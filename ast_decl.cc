@@ -6,7 +6,7 @@
 #include "ast_type.h"
 #include "ast_stmt.h"
 
-Decl::Decl(Identifier *n) : Node(*n->GetLocation()) {
+Decl::Decl(Identifier *n) : Node(*n->GetLocation()), scope(new Scope) {
     Assert(n != NULL);
     (id=n)->SetParent(this);
 }
@@ -20,6 +20,12 @@ int Decl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
      * virtual function.
      */
     return 0;
+}
+
+void Decl::BuildScope(Scope *parent) {
+    /* TODO: Once all subclasses support this function it should be made a pure
+     * virtual function.
+     */
 }
 
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
@@ -42,6 +48,12 @@ int VarDecl::Check(Scope *scope, List<Type*> *typeList) {
         rc = 1;
 
     return rc;
+}
+
+void VarDecl::BuildScope(Scope *parent) {
+    /* VarDecls don't create a new scope of their own */
+    delete scope;
+    scope = parent;
 }
 
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
@@ -84,6 +96,16 @@ int ClassDecl::AddToTypeList(List<Type*> *typeList) {
     return Program::AddUniqType(new NamedType(id), typeList);
 }
 
+void ClassDecl::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        scope->AddDecl(members->Nth(i));
+
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        members->Nth(i)->BuildScope(scope);
+}
+
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     Assert(n != NULL && m != NULL);
     (members=m)->SetParentAll(this);
@@ -106,6 +128,16 @@ int InterfaceDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
 
 int InterfaceDecl::AddToTypeList(List<Type*> *typeList) {
     return Program::AddUniqType(new NamedType(id), typeList);
+}
+
+void InterfaceDecl::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        scope->AddDecl(members->Nth(i));
+
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        members->Nth(i)->BuildScope(scope);
 }
 
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
@@ -135,6 +167,13 @@ int FnDecl::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
 
     scopeList->RemoveAt(scopeList->NumElements()-1);
     return 0;
+}
+
+void FnDecl::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    for (int i = 0, n = formals->NumElements(); i < n; ++i)
+        scope->AddDecl(formals->Nth(i));
 }
 
 int FnDecl::CheckFormals(Scope *formalsScope, List<Type*> *typeList) {

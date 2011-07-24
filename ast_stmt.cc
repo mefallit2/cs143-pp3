@@ -32,7 +32,8 @@ ostream& operator<<(ostream& out, Scope *s) {
 
 Program::Program(List<Decl*> *d) :
 scopeList(new List<Scope*>),
-typeList(new List<Type*>)
+typeList(new List<Type*>),
+scope(new Scope)
 {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
@@ -57,24 +58,26 @@ void Program::Check() {
      *      and polymorphism in the node classes.
      */
 
-    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++) {
-        Decl* d = decls->Nth(i);
+//    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++) {
+//        Decl* d = decls->Nth(i);
+//
+//        ClassDecl *cd = dynamic_cast<ClassDecl*>(d);
+//        if (cd != NULL) {
+//            cd->AddToTypeList(typeList);
+//            continue;
+//        }
+//
+//        InterfaceDecl *id = dynamic_cast<InterfaceDecl*>(d);
+//        if (id != NULL) {
+//            id->AddToTypeList(typeList);
+//            continue;
+//        }
+//    }
+//
+//    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
+//        decls->Nth(i)->Check(scopeList, typeList);
 
-        ClassDecl *cd = dynamic_cast<ClassDecl*>(d);
-        if (cd != NULL) {
-            cd->AddToTypeList(typeList);
-            continue;
-        }
-
-        InterfaceDecl *id = dynamic_cast<InterfaceDecl*>(d);
-        if (id != NULL) {
-            id->AddToTypeList(typeList);
-            continue;
-        }
-    }
-
-    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
-        decls->Nth(i)->Check(scopeList, typeList);
+    BuildScope();
 }
 
 bool Program::IsEquivalentTypeInList(Type *type, List<Type*> *typeList) {
@@ -119,6 +122,14 @@ int Program::AddUniqType(Type *type, List<Type*> *typeList) {
 
     typeList->Append(type);
     return 0;
+}
+
+void Program::BuildScope() {
+    for (int i = 0, n = decls->NumElements(); i < n; ++i)
+        scope->AddDecl(decls->Nth(i));
+
+    for (int i = 0, n = decls->NumElements(); i < n; ++i)
+        decls->Nth(i)->BuildScope(scope);
 }
 
 int Stmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
