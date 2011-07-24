@@ -132,6 +132,33 @@ void ClassDecl::BuildScope(Scope *parent) {
         members->Nth(i)->BuildScope(scope);
 }
 
+void ClassDecl::Check() {
+    CheckExtends();
+    CheckImplements();
+}
+
+void ClassDecl::CheckExtends() {
+    if (extends == NULL)
+        return;
+
+    Decl *lookup = scope->GetParent()->table->Lookup(extends->Name());
+
+    if (lookup == NULL || (dynamic_cast<ClassDecl*>(lookup) == NULL))
+        extends->ReportNotDeclaredIdentifier(LookingForClass);
+}
+
+void ClassDecl::CheckImplements() {
+    Scope *s = scope->GetParent();
+
+    for (int i = 0, n = implements->NumElements(); i < n; ++i) {
+        NamedType *nth = implements->Nth(i);
+        Decl *lookup = s->table->Lookup(nth->Name());
+
+        if (lookup == NULL || (dynamic_cast<InterfaceDecl*>(lookup) == NULL))
+            nth->ReportNotDeclaredIdentifier(LookingForInterface);
+    }
+}
+
 InterfaceDecl::InterfaceDecl(Identifier *n, List<Decl*> *m) : Decl(n) {
     Assert(n != NULL && m != NULL);
     (members=m)->SetParentAll(this);

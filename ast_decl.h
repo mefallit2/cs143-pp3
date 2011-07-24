@@ -71,6 +71,11 @@ class ClassDecl : public Decl
     int AddToTypeList(List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
+    void Check();
+
+  private:
+    void CheckExtends();
+    void CheckImplements();
 };
 
 class InterfaceDecl : public Decl
