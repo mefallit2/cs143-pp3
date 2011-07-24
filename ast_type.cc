@@ -41,9 +41,9 @@ bool NamedType::IsEqualTo(Type *other) {
     NamedType *namedOther = dynamic_cast<NamedType*>(other);
 
     if (namedOther == NULL)
-        return Type::IsEqualTo(other);
-    else
-        return *id == *(namedOther->id);
+        return false;
+
+    return *id == *(namedOther->id);
 }
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
@@ -56,5 +56,10 @@ void ArrayType::ReportNotDeclaredIdentifier(reasonT reason) {
 }
 
 bool ArrayType::IsEqualTo(Type *other) {
-        return elemType->IsEqualTo(other);
+    ArrayType *arrayOther = dynamic_cast<ArrayType*>(other);
+
+    if (arrayOther == NULL)
+        return false;
+
+    return elemType->IsEqualTo(arrayOther->elemType);
 }
