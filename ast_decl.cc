@@ -11,6 +11,13 @@ Decl::Decl(Identifier *n) : Node(*n->GetLocation()), scope(new Scope) {
     (id=n)->SetParent(this);
 }
 
+bool Decl::IsEquivalentTo(Decl *other) {
+    /* TODO: Once all subclasses support this function it should be made a pure
+     * virtual function.
+     */
+    return true;
+}
+
 void Decl::BuildScope(Scope *parent) {
     /* TODO: Once all subclasses support this function it should be made a pure
      * virtual function.
@@ -26,6 +33,14 @@ void Decl::Check() {
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
+}
+
+bool VarDecl::IsEquivalentTo(Decl *other) {
+    VarDecl *varDecl = dynamic_cast<VarDecl*>(other);
+    if (varDecl == NULL)
+        return false;
+
+    return type->IsEquivalentTo(varDecl->type);
 }
 
 void VarDecl::BuildScope(Scope *parent) {
@@ -81,9 +96,12 @@ void ClassDecl::CheckExtends() {
         return;
 
     Decl *lookup = scope->GetParent()->table->Lookup(extends->Name());
+    ClassDecl *extDecl = dynamic_cast<ClassDecl*>(lookup);
 
-    if (lookup == NULL || (dynamic_cast<ClassDecl*>(lookup) == NULL))
+    if (extDecl == NULL)
         extends->ReportNotDeclaredIdentifier(LookingForClass);
+    else
+        CheckMembers(extDecl);
 }
 
 void ClassDecl::CheckImplements() {
@@ -95,6 +113,25 @@ void ClassDecl::CheckImplements() {
 
         if (lookup == NULL || (dynamic_cast<InterfaceDecl*>(lookup) == NULL))
             nth->ReportNotDeclaredIdentifier(LookingForInterface);
+    }
+}
+
+void ClassDecl::CheckMembers(ClassDecl *extDecl) {
+    if (extDecl != NULL && extDecl->extends != NULL) {
+        Scope *s = extDecl->scope->GetParent();
+        Decl *lookup = s->table->Lookup(extDecl->extends->Name());
+        CheckMembers(dynamic_cast<ClassDecl*>(lookup));
+    }
+
+    Scope *extScope = extDecl->scope;
+
+    Iterator<Decl*> iter = scope->table->GetIterator();
+    Decl *d;
+    while ((d = iter.GetNextValue()) != NULL) {
+        Decl *lookup = extScope->table->Lookup(d->Name());
+
+        if (lookup != NULL && !d->IsEquivalentTo(lookup))
+            ReportError::OverrideMismatch(d);
     }
 }
 
@@ -122,6 +159,25 @@ FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {
 
 void FnDecl::SetFunctionBody(Stmt *b) {
     (body=b)->SetParent(this);
+}
+
+bool FnDecl::IsEquivalentTo(Decl *other) {
+    FnDecl *fnDecl = dynamic_cast<FnDecl*>(other);
+
+    if (fnDecl == NULL)
+        return false;
+
+    if (!returnType->IsEquivalentTo(fnDecl->returnType))
+        return false;
+
+    if (formals->NumElements() != fnDecl->formals->NumElements())
+        return false;
+
+    for (int i = 0, n = formals->NumElements(); i < n; ++i)
+        if (!formals->Nth(i)->IsEquivalentTo(fnDecl->formals->Nth(i)))
+            return false;
+
+    return true;
 }
 
 void FnDecl::BuildScope(Scope *parent) {

@@ -33,6 +33,8 @@ class Decl : public Node
     Decl(Identifier *name);
     friend ostream& operator<<(ostream& out, Decl *d) { return out << d->id; }
 
+    virtual bool IsEquivalentTo(Decl *other);
+
     const char* Name() { return id->Name(); }
     virtual void BuildScope(Scope *parent);
     virtual void Check();
@@ -45,6 +47,8 @@ class VarDecl : public Decl
 
   public:
     VarDecl(Identifier *name, Type *type);
+
+    bool IsEquivalentTo(Decl *other);
 
     void BuildScope(Scope *parent);
     void Check();
@@ -70,6 +74,8 @@ class ClassDecl : public Decl
   private:
     void CheckExtends();
     void CheckImplements();
+
+    void CheckMembers(ClassDecl *extDecl);
 };
 
 class InterfaceDecl : public Decl
@@ -93,6 +99,8 @@ class FnDecl : public Decl
   public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);
+
+    bool IsEquivalentTo(Decl *other);
 
     void BuildScope(Scope *parent);
     void Check();
