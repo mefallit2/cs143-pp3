@@ -24,14 +24,17 @@ class NamedType;
 
 class Scope
 {
-  public:
+  private:
     Scope *parent;
+
+  public:
     Hashtable<Decl*> *table;
 
   public:
     Scope() : table(new Hashtable<Decl*>) {}
 
     void SetParent(Scope *p) { parent = p; }
+    Scope* GetParent() { return parent; }
     int AddDecl(Decl *decl);
     friend ostream& operator<<(ostream& out, Scope *s);
 };
@@ -62,10 +65,15 @@ class Program : public Node
 
 class Stmt : public Node
 {
+  protected:
+    Scope *scope;
+
   public:
-     Stmt() : Node() {}
+     Stmt() : Node(), scope(new Scope) {}
      Stmt(yyltype loc) : Node(loc) {}
      virtual int Check(List<Scope*> *scopeList, List<Type*> *typeList);
+
+     virtual void BuildScope(Scope *parent);
 };
 
 class StmtBlock : public Stmt
@@ -77,6 +85,8 @@ class StmtBlock : public Stmt
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
     int Check(List<Scope*> *scopeList, List<Type*> *typeList);
+
+    void BuildScope(Scope *parent);
 
   private:
     int CheckDecls(Scope *blockScope, List<Type*> *typeList);

@@ -37,6 +37,7 @@ class Decl : public Node
     const char* Name() { return id->Name(); }
 
     virtual void BuildScope(Scope *parent);
+    virtual void Check();
 };
 
 class VarDecl : public Decl
@@ -50,6 +51,10 @@ class VarDecl : public Decl
     int Check(Scope *scope, List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
+    void Check();
+
+  private:
+    void CheckType();
 };
 
 class ClassDecl : public Decl
@@ -94,6 +99,8 @@ class FnDecl : public Decl
     int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
+    void Check();
+
   private:
     int CheckFormals(Scope *formalsScope, List<Type*> *typeList);
 };

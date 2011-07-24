@@ -28,6 +28,12 @@ void Decl::BuildScope(Scope *parent) {
      */
 }
 
+void Decl::Check() {
+    /* TODO: Once all subclasses support this function it should be made a pure
+     * virtual function.
+     */
+}
+
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
@@ -54,6 +60,26 @@ void VarDecl::BuildScope(Scope *parent) {
     /* VarDecls don't create a new scope of their own */
     delete scope;
     scope = parent;
+}
+
+void VarDecl::Check() {
+    CheckType();
+}
+
+void VarDecl::CheckType() {
+    NamedType *nt = dynamic_cast<NamedType*>(type);
+
+    if (nt == NULL)
+        return;
+
+    Scope *s = scope;
+    while (s != NULL) {
+        if (s->table->Lookup(nt->Name()) != NULL)
+            return;
+        s = s->GetParent();
+    }
+
+    type->ReportNotDeclaredIdentifier(LookingForType);
 }
 
 ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<Decl*> *m) : Decl(n) {
@@ -174,6 +200,17 @@ void FnDecl::BuildScope(Scope *parent) {
 
     for (int i = 0, n = formals->NumElements(); i < n; ++i)
         scope->AddDecl(formals->Nth(i));
+
+    for (int i = 0, n = formals->NumElements(); i < n; ++i)
+        formals->Nth(i)->BuildScope(scope);
+
+    if (body)
+        body->BuildScope(scope);
+}
+
+void FnDecl::Check() {
+    for (int i = 0, n = formals->NumElements(); i < n; ++i)
+        formals->Nth(i)->Check();
 }
 
 int FnDecl::CheckFormals(Scope *formalsScope, List<Type*> *typeList) {

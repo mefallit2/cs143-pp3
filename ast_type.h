@@ -49,6 +49,8 @@ class NamedType : public Type
     void ReportNotDeclaredIdentifier(reasonT reason);
     bool IsEqualTo(Type *other);
     bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
+
+    const char* Name() { return id->Name(); }
 };
 
 class ArrayType : public Type

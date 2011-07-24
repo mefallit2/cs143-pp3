@@ -78,6 +78,9 @@ void Program::Check() {
 //        decls->Nth(i)->Check(scopeList, typeList);
 
     BuildScope();
+
+    for (int i = 0, n = decls->NumElements(); i < n; ++i)
+        decls->Nth(i)->Check();
 }
 
 bool Program::IsEquivalentTypeInList(Type *type, List<Type*> *typeList) {
@@ -144,6 +147,12 @@ int Stmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     return 0;
 }
 
+void Stmt::BuildScope(Scope *parent) {
+    /* TODO: Once all sublcasses support this function it should be made a pure
+     * virtual function.
+     */
+}
+
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
@@ -165,6 +174,19 @@ int StmtBlock::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
     scopeList->RemoveAt(scopeList->NumElements()-1);
 
     return rc;
+}
+
+void StmtBlock::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    for (int i = 0, n = decls->NumElements(); i < n; ++i)
+        scope->AddDecl(decls->Nth(i));
+
+    for (int i = 0, n = decls->NumElements(); i < n; ++i)
+        decls->Nth(i)->BuildScope(scope);
+
+    for (int i = 0, n = stmts->NumElements(); i < n; ++i)
+        stmts->Nth(i)->BuildScope(scope);
 }
 
 int StmtBlock::CheckDecls(Scope *blockScope, List<Type*> *typeList) {
