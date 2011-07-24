@@ -56,10 +56,5 @@ void ArrayType::ReportNotDeclaredIdentifier(reasonT reason) {
 }
 
 bool ArrayType::IsEqualTo(Type *other) {
-    ArrayType *arrayOther = dynamic_cast<ArrayType*>(other);
-
-    if (arrayOther == NULL)
-        return Type::IsEqualTo(other);
-    else
-        return elemType->IsEqualTo(arrayOther->elemType);
+        return elemType->IsEqualTo(other);
 }
