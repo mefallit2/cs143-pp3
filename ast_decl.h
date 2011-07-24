@@ -21,6 +21,7 @@ class Type;
 class NamedType;
 class Identifier;
 class Stmt;
+class InterfaceDecl;
 
 class Decl : public Node
 {
@@ -36,6 +37,8 @@ class Decl : public Node
     virtual bool IsEquivalentTo(Decl *other);
 
     const char* Name() { return id->Name(); }
+    Scope* GetScope() { return scope; }
+
     virtual void BuildScope(Scope *parent);
     virtual void Check();
 };
@@ -75,7 +78,9 @@ class ClassDecl : public Decl
     void CheckExtends();
     void CheckImplements();
 
-    void CheckMembers(ClassDecl *extDecl);
+    void CheckExtendedMembers(ClassDecl *extDecl);
+    void CheckImplementedMembers(InterfaceDecl *intDecl);
+    void CheckAgainstScope(Scope *other);
 };
 
 class InterfaceDecl : public Decl

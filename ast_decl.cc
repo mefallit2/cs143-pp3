@@ -101,7 +101,7 @@ void ClassDecl::CheckExtends() {
     if (extDecl == NULL)
         extends->ReportNotDeclaredIdentifier(LookingForClass);
     else
-        CheckMembers(extDecl);
+        CheckExtendedMembers(extDecl);
 }
 
 void ClassDecl::CheckImplements() {
@@ -110,25 +110,34 @@ void ClassDecl::CheckImplements() {
     for (int i = 0, n = implements->NumElements(); i < n; ++i) {
         NamedType *nth = implements->Nth(i);
         Decl *lookup = s->table->Lookup(nth->Name());
+        InterfaceDecl *intDecl = dynamic_cast<InterfaceDecl*>(lookup);
 
-        if (lookup == NULL || (dynamic_cast<InterfaceDecl*>(lookup) == NULL))
+        if (intDecl == NULL)
             nth->ReportNotDeclaredIdentifier(LookingForInterface);
+        else
+            CheckImplementedMembers(intDecl);
     }
 }
 
-void ClassDecl::CheckMembers(ClassDecl *extDecl) {
+void ClassDecl::CheckExtendedMembers(ClassDecl *extDecl) {
     if (extDecl != NULL && extDecl->extends != NULL) {
         Scope *s = extDecl->scope->GetParent();
         Decl *lookup = s->table->Lookup(extDecl->extends->Name());
-        CheckMembers(dynamic_cast<ClassDecl*>(lookup));
+        CheckExtendedMembers(dynamic_cast<ClassDecl*>(lookup));
     }
 
-    Scope *extScope = extDecl->scope;
+    CheckAgainstScope(extDecl->scope);
+}
 
+void ClassDecl::CheckImplementedMembers(InterfaceDecl *intDecl) {
+    CheckAgainstScope(intDecl->GetScope());
+}
+
+void ClassDecl::CheckAgainstScope(Scope *other) {
     Iterator<Decl*> iter = scope->table->GetIterator();
     Decl *d;
     while ((d = iter.GetNextValue()) != NULL) {
-        Decl *lookup = extScope->table->Lookup(d->Name());
+        Decl *lookup = other->table->Lookup(d->Name());
 
         if (lookup != NULL && !d->IsEquivalentTo(lookup))
             ReportError::OverrideMismatch(d);
