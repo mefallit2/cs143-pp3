@@ -43,8 +43,6 @@ class Program : public Node
 {
   protected:
      List<Decl*> *decls;
-     List<Scope*> *scopeList;
-     List<Type*> *typeList;
 
      Scope *scope;
 
@@ -52,14 +50,7 @@ class Program : public Node
      Program(List<Decl*> *declList);
      void Check();
 
-     static int CheckType(Type *type, List<Type*> *typeList);
-     static int CheckClass(NamedType *type, List<Type*> *typeList);
-     static int CheckInterface(NamedType *type, List<Type*> *typeList);
-     static int AddUniqType(Type *type, List<Type*> *typeList);
-
   private:
-     static bool IsEquivalentTypeInList(Type *type, List<Type*> *typeList);
-
      void BuildScope();
 };
 
@@ -71,7 +62,6 @@ class Stmt : public Node
   public:
      Stmt() : Node(), scope(new Scope) {}
      Stmt(yyltype loc) : Node(loc) {}
-     virtual int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
      virtual void BuildScope(Scope *parent);
      virtual void Check();
@@ -85,13 +75,11 @@ class StmtBlock : public Stmt
 
   public:
     StmtBlock(List<VarDecl*> *variableDeclarations, List<Stmt*> *statements);
-    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
     void Check();
 
   private:
-    int CheckDecls(Scope *blockScope, List<Type*> *typeList);
 };
 
 class ConditionalStmt : public Stmt
@@ -102,7 +90,6 @@ class ConditionalStmt : public Stmt
 
   public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
-    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
     void Check();

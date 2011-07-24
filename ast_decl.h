@@ -32,10 +32,8 @@ class Decl : public Node
   public:
     Decl(Identifier *name);
     friend ostream& operator<<(ostream& out, Decl *d) { return out << d->id; }
-    bool operator==(const Decl &rhs);
-    virtual int Check(List<Scope*> *scopeList, List<Type*> *typeList);
-    const char* Name() { return id->Name(); }
 
+    const char* Name() { return id->Name(); }
     virtual void BuildScope(Scope *parent);
     virtual void Check();
 };
@@ -47,8 +45,6 @@ class VarDecl : public Decl
 
   public:
     VarDecl(Identifier *name, Type *type);
-    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
-    int Check(Scope *scope, List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
     void Check();
@@ -67,8 +63,6 @@ class ClassDecl : public Decl
   public:
     ClassDecl(Identifier *name, NamedType *extends,
               List<NamedType*> *implements, List<Decl*> *members);
-    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
-    int AddToTypeList(List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
     void Check();
@@ -85,8 +79,6 @@ class InterfaceDecl : public Decl
 
   public:
     InterfaceDecl(Identifier *name, List<Decl*> *members);
-    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
-    int AddToTypeList(List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
 };
@@ -101,13 +93,9 @@ class FnDecl : public Decl
   public:
     FnDecl(Identifier *name, Type *returnType, List<VarDecl*> *formals);
     void SetFunctionBody(Stmt *b);
-    int Check(List<Scope*> *scopeList, List<Type*> *typeList);
 
     void BuildScope(Scope *parent);
     void Check();
-
-  private:
-    int CheckFormals(Scope *formalsScope, List<Type*> *typeList);
 };
 
 #endif

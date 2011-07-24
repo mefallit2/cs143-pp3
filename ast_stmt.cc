@@ -30,23 +30,9 @@ ostream& operator<<(ostream& out, Scope *s) {
     return out;
 }
 
-Program::Program(List<Decl*> *d) :
-scopeList(new List<Scope*>),
-typeList(new List<Type*>),
-scope(new Scope)
-{
+Program::Program(List<Decl*> *d) : scope(new Scope) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
-    scopeList->Append(new Scope); // Initial empty global scope
-
-    // Append all primitive types
-    typeList->Append(Type::intType);
-    typeList->Append(Type::doubleType);
-    typeList->Append(Type::boolType);
-    typeList->Append(Type::voidType);
-    typeList->Append(Type::nullType);
-    typeList->Append(Type::stringType);
-    typeList->Append(Type::errorType);
 }
 
 void Program::Check() {
@@ -58,73 +44,10 @@ void Program::Check() {
      *      and polymorphism in the node classes.
      */
 
-//    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++) {
-//        Decl* d = decls->Nth(i);
-//
-//        ClassDecl *cd = dynamic_cast<ClassDecl*>(d);
-//        if (cd != NULL) {
-//            cd->AddToTypeList(typeList);
-//            continue;
-//        }
-//
-//        InterfaceDecl *id = dynamic_cast<InterfaceDecl*>(d);
-//        if (id != NULL) {
-//            id->AddToTypeList(typeList);
-//            continue;
-//        }
-//    }
-//
-//    for (int i = 0, numElems = decls->NumElements(); i < numElems; i++)
-//        decls->Nth(i)->Check(scopeList, typeList);
-
     BuildScope();
 
     for (int i = 0, n = decls->NumElements(); i < n; ++i)
         decls->Nth(i)->Check();
-}
-
-bool Program::IsEquivalentTypeInList(Type *type, List<Type*> *typeList) {
-    for (int i = 0, n = typeList->NumElements(); i < n; ++i) {
-        if (type->IsEquivalentTo(typeList->Nth(i)))
-            return true;
-    }
-
-    return false;
-}
-
-int Program::CheckType(Type *type, List<Type*> *typeList) {
-    if (IsEquivalentTypeInList(type, typeList))
-        return 0;
-
-    type->ReportNotDeclaredIdentifier(LookingForType);
-    return 1;
-}
-
-int Program::CheckClass(NamedType *type, List<Type*> *typeList) {
-    if (IsEquivalentTypeInList(type, typeList))
-        return 0;
-
-    type->ReportNotDeclaredIdentifier(LookingForClass);
-    return 1;
-}
-
-int Program::CheckInterface(NamedType *type, List<Type*> *typeList) {
-    if (IsEquivalentTypeInList(type, typeList))
-        return 0;
-
-    type->ReportNotDeclaredIdentifier(LookingForInterface);
-    return 1;
-}
-
-int Program::AddUniqType(Type *type, List<Type*> *typeList) {
-    for (int i = 0, n = typeList->NumElements(); i < n; ++i) {
-        if (type->IsEqualTo(typeList->Nth(i))) {
-            return 1;
-        }
-    }
-
-    typeList->Append(type);
-    return 0;
 }
 
 void Program::BuildScope() {
@@ -133,18 +56,6 @@ void Program::BuildScope() {
 
     for (int i = 0, n = decls->NumElements(); i < n; ++i)
         decls->Nth(i)->BuildScope(scope);
-}
-
-int Stmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
-    /* TODO: Once all sublcasses support this function it should be made a pure
-     * virtual function.
-     */
-
-    // Not quite sure why we are here and not in the subclass implementation
-    if (dynamic_cast<ConditionalStmt*>(this) != NULL)
-        (static_cast<ConditionalStmt*>(this))->Check(scopeList, typeList);
-
-    return 0;
 }
 
 void Stmt::BuildScope(Scope *parent) {
@@ -163,23 +74,6 @@ StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);
     (stmts=s)->SetParentAll(this);
-}
-
-int StmtBlock::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
-    int rc = 0;
-
-    Scope *blockScope = new Scope;
-    if (CheckDecls(blockScope, typeList) != 0)
-        rc = 1;
-    scopeList->Append(blockScope);
-
-    for (int i = 0, n = stmts->NumElements(); i < n; ++i)
-        if (stmts->Nth(i)->Check(scopeList, typeList) != 0)
-            rc = 1;
-
-    scopeList->RemoveAt(scopeList->NumElements()-1);
-
-    return rc;
 }
 
 void StmtBlock::BuildScope(Scope *parent) {
@@ -203,32 +97,10 @@ void StmtBlock::Check() {
         stmts->Nth(i)->Check();
 }
 
-int StmtBlock::CheckDecls(Scope *blockScope, List<Type*> *typeList) {
-    for (int i = 0, n = decls->NumElements(); i < n; ++i)
-        if (decls->Nth(i)->Check(blockScope, typeList) != 0)
-            return 1;
-
-    return 0;
-}
-
 ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
     Assert(t != NULL && b != NULL);
     (test=t)->SetParent(this);
     (body=b)->SetParent(this);
-}
-
-int ConditionalStmt::Check(List<Scope*> *scopeList, List<Type*> *typeList) {
-    int rc = 0;
-
-    Scope *bodyScope = new Scope;
-    scopeList->Append(bodyScope);
-
-    if (body->Check(scopeList, typeList) != 0)
-        rc = 1;
-
-    scopeList->RemoveAt(scopeList->NumElements()-1);
-
-    return rc;
 }
 
 void ConditionalStmt::BuildScope(Scope *parent) {
