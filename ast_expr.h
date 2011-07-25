@@ -24,6 +24,8 @@ class Expr : public Stmt
   public:
     Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
+
+    virtual Type* GetType();
 };
 
 /* This node type is used for those places where an expression is optional.
@@ -41,6 +43,8 @@ class IntConstant : public Expr
 
   public:
     IntConstant(yyltype loc, int val);
+
+    Type* GetType();
 };
 
 class DoubleConstant : public Expr
@@ -50,6 +54,8 @@ class DoubleConstant : public Expr
 
   public:
     DoubleConstant(yyltype loc, double val);
+
+    Type* GetType();
 };
 
 class BoolConstant : public Expr
@@ -59,6 +65,8 @@ class BoolConstant : public Expr
 
   public:
     BoolConstant(yyltype loc, bool val);
+
+    Type* GetType();
 };
 
 class StringConstant : public Expr
@@ -68,12 +76,16 @@ class StringConstant : public Expr
 
   public:
     StringConstant(yyltype loc, const char *val);
+
+    Type* GetType();
 };
 
 class NullConstant: public Expr
 {
   public:
     NullConstant(yyltype loc) : Expr(loc) {}
+
+    Type* GetType();
 };
 
 class Operator : public Node
@@ -102,6 +114,9 @@ class ArithmeticExpr : public CompoundExpr
   public:
     ArithmeticExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     ArithmeticExpr(Operator *op, Expr *rhs) : CompoundExpr(op,rhs) {}
+
+    Type* GetType();
+    void Check();
 };
 
 class RelationalExpr : public CompoundExpr
@@ -130,6 +145,9 @@ class AssignExpr : public CompoundExpr
   public:
     AssignExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
     const char *GetPrintNameForNode() { return "AssignExpr"; }
+
+    Type* GetType();
+    void Check();
 };
 
 class LValue : public Expr

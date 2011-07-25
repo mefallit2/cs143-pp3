@@ -8,21 +8,48 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 
+Type* Expr::GetType() {
+    /* TODO: Once all sublcasses support this function it should be made a pure
+    * virtual function.
+    */
+    return Type::errorType;
+}
+
 IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
+}
+
+Type* IntConstant::GetType() {
+    return Type::intType;
 }
 
 DoubleConstant::DoubleConstant(yyltype loc, double val) : Expr(loc) {
     value = val;
 }
 
+Type* DoubleConstant::GetType() {
+    return Type::doubleType;
+}
+
 BoolConstant::BoolConstant(yyltype loc, bool val) : Expr(loc) {
     value = val;
+}
+
+Type* BoolConstant::GetType() {
+    return Type::boolType;
 }
 
 StringConstant::StringConstant(yyltype loc, const char *val) : Expr(loc) {
     Assert(val != NULL);
     value = strdup(val);
+}
+
+Type* StringConstant::GetType() {
+    return Type::stringType;
+}
+
+Type* NullConstant::GetType() {
+    return Type::nullType;
 }
 
 Operator::Operator(yyltype loc, const char *tok) : Node(loc) {
@@ -44,6 +71,54 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     left = NULL;
     (op=o)->SetParent(this);
     (right=r)->SetParent(this);
+}
+
+Type* ArithmeticExpr::GetType() {
+    Type *ltype = left->GetType();
+    Type *rtype = right->GetType();
+
+    if (ltype->IsEquivalentTo(Type::intType) &&
+        rtype->IsEquivalentTo(Type::intType))
+        return ltype;
+
+    if (ltype->IsEquivalentTo(Type::doubleType) &&
+        rtype->IsEquivalentTo(Type::doubleType))
+        return ltype;
+
+    return Type::errorType;
+}
+
+void ArithmeticExpr::Check() {
+    Type *ltype = left->GetType();
+    Type *rtype = right->GetType();
+
+    if (ltype->IsEquivalentTo(Type::intType) &&
+        rtype->IsEquivalentTo(Type::intType))
+        return;
+
+    if (ltype->IsEquivalentTo(Type::doubleType) &&
+        rtype->IsEquivalentTo(Type::doubleType))
+        return;
+
+    ReportError::IncompatibleOperands(op, ltype, rtype);
+}
+
+Type* AssignExpr::GetType() {
+    Type *ltype = left->GetType();
+    Type *rtype = right->GetType();
+
+    if (!rtype->IsEquivalentTo(ltype))
+        return Type::errorType;
+
+    return ltype;
+}
+
+void AssignExpr::Check() {
+    Type *ltype = left->GetType();
+    Type *rtype = right->GetType();
+
+    if (!rtype->IsEquivalentTo(ltype))
+        ReportError::IncompatibleOperands(op, ltype, rtype);
 }
 
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {

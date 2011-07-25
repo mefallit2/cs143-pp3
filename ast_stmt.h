@@ -61,7 +61,7 @@ class Stmt : public Node
 
   public:
      Stmt() : Node(), scope(new Scope) {}
-     Stmt(yyltype loc) : Node(loc) {}
+     Stmt(yyltype loc) : Node(loc), scope(new Scope) {}
 
      virtual void BuildScope(Scope *parent);
      virtual void Check();
