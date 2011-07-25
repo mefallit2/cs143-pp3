@@ -59,9 +59,7 @@ void Program::BuildScope() {
 }
 
 void Stmt::BuildScope(Scope *parent) {
-    /* TODO: Once all sublcasses support this function it should be made a pure
-     * virtual function.
-     */
+    scope->SetParent(parent);
 }
 
 void Stmt::Check() {

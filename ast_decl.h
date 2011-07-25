@@ -53,7 +53,6 @@ class VarDecl : public Decl
 
     bool IsEquivalentTo(Decl *other);
 
-    void BuildScope(Scope *parent);
     void Check();
 
   private:

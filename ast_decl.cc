@@ -19,9 +19,7 @@ bool Decl::IsEquivalentTo(Decl *other) {
 }
 
 void Decl::BuildScope(Scope *parent) {
-    /* TODO: Once all subclasses support this function it should be made a pure
-     * virtual function.
-     */
+    scope->SetParent(parent);
 }
 
 void Decl::Check() {
@@ -41,12 +39,6 @@ bool VarDecl::IsEquivalentTo(Decl *other) {
         return false;
 
     return type->IsEquivalentTo(varDecl->type);
-}
-
-void VarDecl::BuildScope(Scope *parent) {
-    /* VarDecls don't create a new scope of their own */
-    delete scope;
-    scope = parent;
 }
 
 void VarDecl::Check() {
