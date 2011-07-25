@@ -145,7 +145,14 @@ void ClassDecl::CheckAgainstScope(Scope *other) {
     while ((d = iter.GetNextValue()) != NULL) {
         Decl *lookup = other->table->Lookup(d->Name());
 
-        if (lookup != NULL && !d->IsEquivalentTo(lookup))
+        if (lookup == NULL)
+            continue;
+
+        if (dynamic_cast<VarDecl*>(lookup) != NULL)
+            ReportError::DeclConflict(d, lookup);
+
+        if (dynamic_cast<FnDecl*>(lookup) != NULL &&
+            !d->IsEquivalentTo(lookup))
             ReportError::OverrideMismatch(d);
     }
 }
