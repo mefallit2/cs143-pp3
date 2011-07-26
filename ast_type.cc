@@ -28,6 +28,13 @@ Type::Type(const char *n) {
     typeName = strdup(n);
 }
 
+bool Type::IsEquivalentTo(Type *other) {
+    if (IsEqualTo(Type::errorType))
+        return true;
+
+    return IsEqualTo(other);
+}
+
 NamedType::NamedType(Identifier *i) : Type(*i->GetLocation()) {
     Assert(i != NULL);
     (id=i)->SetParent(this);
