@@ -41,10 +41,11 @@ class Scope
 
 class Program : public Node
 {
+  public:
+     static Scope *gScope;
+
   protected:
      List<Decl*> *decls;
-
-     Scope *scope;
 
   public:
      Program(List<Decl*> *declList);

@@ -74,6 +74,8 @@ class ClassDecl : public Decl
     void BuildScope(Scope *parent);
     void Check();
 
+    NamedType* GetExtends() { return extends; }
+
   private:
     void CheckExtends();
     void CheckImplements();

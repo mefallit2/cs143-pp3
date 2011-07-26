@@ -51,7 +51,7 @@ class NamedType : public Type
     void PrintToStream(ostream& out) { out << id; }
     void ReportNotDeclaredIdentifier(reasonT reason);
     bool IsEqualTo(Type *other);
-    bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
+    bool IsEquivalentTo(Type *other);
 
     const char* Name() { return id->Name(); }
     bool IsPrimitive() { return false; }

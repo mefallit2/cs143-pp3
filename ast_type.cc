@@ -53,6 +53,25 @@ bool NamedType::IsEqualTo(Type *other) {
     return *id == *(namedOther->id);
 }
 
+bool NamedType::IsEquivalentTo(Type *other) {
+    if (IsEqualTo(other))
+        return true;
+
+    NamedType *nType = this;
+    Decl *lookup;
+    while ((lookup = Program::gScope->table->Lookup(nType->Name())) != NULL) {
+        ClassDecl *c = dynamic_cast<ClassDecl*>(lookup);
+        if (c == NULL)
+            return false;
+
+        NamedType *nType = c->GetExtends();
+        if (nType->IsEqualTo(other))
+            return true;
+    }
+
+    return false;
+}
+
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
     Assert(et != NULL);
     (elemType=et)->SetParent(this);

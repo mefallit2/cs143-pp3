@@ -30,7 +30,9 @@ ostream& operator<<(ostream& out, Scope *s) {
     return out;
 }
 
-Program::Program(List<Decl*> *d) : scope(new Scope) {
+Scope *Program::gScope = new Scope();
+
+Program::Program(List<Decl*> *d) {
     Assert(d != NULL);
     (decls=d)->SetParentAll(this);
 }
@@ -52,10 +54,10 @@ void Program::Check() {
 
 void Program::BuildScope() {
     for (int i = 0, n = decls->NumElements(); i < n; ++i)
-        scope->AddDecl(decls->Nth(i));
+        gScope->AddDecl(decls->Nth(i));
 
     for (int i = 0, n = decls->NumElements(); i < n; ++i)
-        decls->Nth(i)->BuildScope(scope);
+        decls->Nth(i)->BuildScope(gScope);
 }
 
 void Stmt::BuildScope(Scope *parent) {
