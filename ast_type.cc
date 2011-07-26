@@ -89,3 +89,12 @@ bool ArrayType::IsEqualTo(Type *other) {
 
     return elemType->IsEqualTo(arrayOther->elemType);
 }
+
+bool ArrayType::IsEquivalentTo(Type *other) {
+    ArrayType *arrayOther = dynamic_cast<ArrayType*>(other);
+
+    if (arrayOther == NULL)
+        return false;
+
+    return elemType->IsEquivalentTo(arrayOther->elemType);
+}

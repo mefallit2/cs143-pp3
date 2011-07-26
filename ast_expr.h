@@ -172,6 +172,10 @@ class ArrayAccess : public LValue
 
   public:
     ArrayAccess(yyltype loc, Expr *base, Expr *subscript);
+
+    Type* GetType();
+    void BuildScope(Scope *parent);
+    void Check();
 };
 
 /* Note that field access is used both for qualified names

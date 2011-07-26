@@ -68,10 +68,12 @@ class ArrayType : public Type
     void PrintToStream(ostream& out) { out << elemType << "[]"; }
     void ReportNotDeclaredIdentifier(reasonT reason);
     bool IsEqualTo(Type *other);
-    bool IsEquivalentTo(Type *other) { return IsEqualTo(other); }
+    bool IsEquivalentTo(Type *other);
 
     const char* Name() { return elemType->Name(); }
     bool IsPrimitive() { return false; }
+
+    Type* GetElemType() { return elemType; }
 };
 
 #endif

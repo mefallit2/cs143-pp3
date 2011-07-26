@@ -169,6 +169,30 @@ ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (subscript=s)->SetParent(this);
 }
 
+Type* ArrayAccess::GetType() {
+    ArrayType *t = dynamic_cast<ArrayType*>(base->GetType());
+    if (t == NULL)
+        return Type::errorType;
+
+    return t->GetElemType();
+}
+
+void ArrayAccess::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    base->BuildScope(parent);
+    subscript->BuildScope(parent);
+}
+
+void ArrayAccess::Check() {
+    ArrayType *t = dynamic_cast<ArrayType*>(base->GetType());
+    if (t == NULL)
+        ReportError::BracketsOnNonArray(base);
+
+    if (!subscript->GetType()->IsEqualTo(Type::intType))
+        ReportError::SubscriptNotInteger(subscript);
+}
+
 FieldAccess::FieldAccess(Expr *b, Identifier *f)
   : LValue(b? Join(b->GetLocation(), f->GetLocation()) : *f->GetLocation()) {
     Assert(f != NULL); // b can be be NULL (just means no explicit base)
