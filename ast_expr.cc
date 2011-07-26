@@ -73,6 +73,18 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
     (right=r)->SetParent(this);
 }
 
+void CompoundExpr::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    left->BuildScope(parent);
+    right->BuildScope(parent);
+}
+
+void CompoundExpr::Check() {
+    left->Check();
+    right->Check();
+}
+
 Type* ArithmeticExpr::GetType() {
     Type *ltype = left->GetType();
     Type *rtype = right->GetType();
@@ -89,6 +101,9 @@ Type* ArithmeticExpr::GetType() {
 }
 
 void ArithmeticExpr::Check() {
+    left->Check();
+    right->Check();
+
     Type *ltype = left->GetType();
     Type *rtype = right->GetType();
 
@@ -114,6 +129,9 @@ Type* AssignExpr::GetType() {
 }
 
 void AssignExpr::Check() {
+    left->Check();
+    right->Check();
+
     Type *ltype = left->GetType();
     Type *rtype = right->GetType();
 
@@ -132,6 +150,31 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
     base = b;
     if (base) base->SetParent(this);
     (field=f)->SetParent(this);
+}
+
+Type* FieldAccess::GetType() {
+    if (base != NULL) // TODO: Add proper handling when base != NULL
+        return Type::errorType;
+
+    Scope *s = scope;
+    while (s != NULL) {
+        Decl *lookup;
+        VarDecl *varDecl;
+        if ((lookup = s->table->Lookup(field->Name())) != NULL &&
+            (varDecl = dynamic_cast<VarDecl*>(lookup)) != NULL)
+            return varDecl->GetType();
+
+        s = s->GetParent();
+    }
+
+    return Type::errorType;
+}
+
+void FieldAccess::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    if (base != NULL)
+        base->BuildScope(parent);
 }
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {

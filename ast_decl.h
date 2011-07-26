@@ -53,6 +53,7 @@ class VarDecl : public Decl
 
     bool IsEquivalentTo(Decl *other);
 
+    Type* GetType() { return type; }
     void Check();
 
   private:

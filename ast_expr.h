@@ -107,6 +107,9 @@ class CompoundExpr : public Expr
   public:
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs); // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
+
+    void BuildScope(Scope *parent);
+    void Check();
 };
 
 class ArithmeticExpr : public CompoundExpr
@@ -184,6 +187,9 @@ class FieldAccess : public LValue
 
   public:
     FieldAccess(Expr *base, Identifier *field); //ok to pass NULL base
+
+    Type* GetType();
+    void BuildScope(Scope *parent);
 };
 
 /* Like field access, call is used both for qualified base.field()
