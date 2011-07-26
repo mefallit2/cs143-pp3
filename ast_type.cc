@@ -65,6 +65,9 @@ bool NamedType::IsEquivalentTo(Type *other) {
             return false;
 
         NamedType *nType = c->GetExtends();
+        if (nType == NULL)
+            break;
+
         if (nType->IsEqualTo(other))
             return true;
     }
@@ -73,6 +76,11 @@ bool NamedType::IsEquivalentTo(Type *other) {
 }
 
 ArrayType::ArrayType(yyltype loc, Type *et) : Type(loc) {
+    Assert(et != NULL);
+    (elemType=et)->SetParent(this);
+}
+
+ArrayType::ArrayType(Type *et) : Type() {
     Assert(et != NULL);
     (elemType=et)->SetParent(this);
 }

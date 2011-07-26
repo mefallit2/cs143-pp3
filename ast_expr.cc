@@ -185,6 +185,9 @@ void ArrayAccess::BuildScope(Scope *parent) {
 }
 
 void ArrayAccess::Check() {
+    base->Check();
+    subscript->Check();
+
     ArrayType *t = dynamic_cast<ArrayType*>(base->GetType());
     if (t == NULL)
         ReportError::BracketsOnNonArray(base);
@@ -243,4 +246,21 @@ NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     Assert(sz != NULL && et != NULL);
     (size=sz)->SetParent(this);
     (elemType=et)->SetParent(this);
+}
+
+Type* NewArrayExpr::GetType() {
+    return new ArrayType(elemType);
+}
+
+void NewArrayExpr::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    size->BuildScope(parent);
+}
+
+void NewArrayExpr::Check() {
+    size->Check();
+
+    if (!size->GetType()->IsEqualTo(Type::intType))
+        ReportError::NewArraySizeNotInteger(size);
 }

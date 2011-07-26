@@ -28,6 +28,7 @@ class Type : public Node
                 *nullType, *stringType, *errorType;
 
     Type(yyltype loc) : Node(loc) {}
+    Type() : Node() {}
     Type(const char *str);
 
     virtual void PrintToStream(ostream& out) { out << typeName; }
@@ -64,6 +65,7 @@ class ArrayType : public Type
 
   public:
     ArrayType(yyltype loc, Type *elemType);
+    ArrayType(Type *elemType);
 
     void PrintToStream(ostream& out) { out << elemType << "[]"; }
     void ReportNotDeclaredIdentifier(reasonT reason);
