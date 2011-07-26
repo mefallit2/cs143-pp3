@@ -76,18 +76,31 @@ CompoundExpr::CompoundExpr(Operator *o, Expr *r)
 void CompoundExpr::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 
-    left->BuildScope(parent);
+    if (left != NULL)
+        left->BuildScope(parent);
+
     right->BuildScope(parent);
 }
 
 void CompoundExpr::Check() {
-    left->Check();
+    if (left != NULL)
+        left->Check();
+
     right->Check();
 }
 
 Type* ArithmeticExpr::GetType() {
-    Type *ltype = left->GetType();
     Type *rtype = right->GetType();
+
+    if (left == NULL) {
+        if (rtype->IsEquivalentTo(Type::intType) ||
+            rtype->IsEquivalentTo(Type::doubleType))
+            return rtype;
+        else
+            return Type::errorType;
+    }
+
+    Type *ltype = left->GetType();
 
     if (ltype->IsEquivalentTo(Type::intType) &&
         rtype->IsEquivalentTo(Type::intType))
@@ -101,11 +114,23 @@ Type* ArithmeticExpr::GetType() {
 }
 
 void ArithmeticExpr::Check() {
-    left->Check();
+    if (left != NULL)
+        left->Check();
+
     right->Check();
 
-    Type *ltype = left->GetType();
     Type *rtype = right->GetType();
+
+    if (left == NULL) {
+        if (rtype->IsEquivalentTo(Type::intType) ||
+            rtype->IsEquivalentTo(Type::doubleType))
+            return;
+        else
+            ReportError::IncompatibleOperand(op, rtype);
+            return;
+    }
+
+    Type *ltype = left->GetType();
 
     if (ltype->IsEquivalentTo(Type::intType) &&
         rtype->IsEquivalentTo(Type::intType))
