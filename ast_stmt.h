@@ -29,12 +29,15 @@ class Scope
 
   public:
     Hashtable<Decl*> *table;
+    bool isClassScope;
 
   public:
-    Scope() : table(new Hashtable<Decl*>) {}
+    Scope() : table(new Hashtable<Decl*>), isClassScope(false) {}
 
     void SetParent(Scope *p) { parent = p; }
     Scope* GetParent() { return parent; }
+    void SetClassScope(bool b) { isClassScope = b; }
+    bool GetClassScope() { return isClassScope; }
     int AddDecl(Decl *decl);
     friend ostream& operator<<(ostream& out, Scope *s);
 };

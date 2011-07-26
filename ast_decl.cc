@@ -70,6 +70,7 @@ ClassDecl::ClassDecl(Identifier *n, NamedType *ex, List<NamedType*> *imp, List<D
 
 void ClassDecl::BuildScope(Scope *parent) {
     scope->SetParent(parent);
+    scope->SetClassScope(true);
 
     for (int i = 0, n = members->NumElements(); i < n; ++i)
         scope->AddDecl(members->Nth(i));

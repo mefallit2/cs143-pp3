@@ -164,6 +164,17 @@ void AssignExpr::Check() {
         ReportError::IncompatibleOperands(op, ltype, rtype);
 }
 
+void This::Check() {
+    Scope *s = scope;
+    while (s != NULL) {
+        if (s->GetClassScope())
+            return;
+        s = s->GetParent();
+    }
+
+    ReportError::ThisOutsideClassScope(this);
+}
+
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
     (base=b)->SetParent(this);
     (subscript=s)->SetParent(this);

@@ -163,6 +163,8 @@ class This : public Expr
 {
   public:
     This(yyltype loc) : Expr(loc) {}
+
+    void Check();
 };
 
 class ArrayAccess : public LValue
