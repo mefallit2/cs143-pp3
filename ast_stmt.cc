@@ -130,6 +130,27 @@ IfStmt::IfStmt(Expr *t, Stmt *tb, Stmt *eb): ConditionalStmt(t, tb) {
     if (elseBody) elseBody->SetParent(this);
 }
 
+void IfStmt::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    test->BuildScope(scope);
+    body->BuildScope(scope);
+
+    if (elseBody != NULL)
+        elseBody->BuildScope(scope);
+}
+
+void IfStmt::Check() {
+    test->Check();
+    body->Check();
+
+    if (!test->GetType()->IsEquivalentTo(Type::boolType))
+        ReportError::TestNotBoolean(test);
+
+    if (elseBody != NULL)
+        elseBody->Check();
+}
+
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     Assert(e != NULL);
     (expr=e)->SetParent(this);

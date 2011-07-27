@@ -132,6 +132,9 @@ class IfStmt : public ConditionalStmt
 
   public:
     IfStmt(Expr *test, Stmt *thenBody, Stmt *elseBody);
+
+    void BuildScope(Scope *parent);
+    void Check();
 };
 
 class BreakStmt : public Stmt
