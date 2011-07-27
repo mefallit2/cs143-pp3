@@ -32,6 +32,9 @@ bool Type::IsEquivalentTo(Type *other) {
     if (IsEqualTo(Type::errorType))
         return true;
 
+    if (IsEqualTo(Type::nullType) && dynamic_cast<NamedType*>(other))
+        return true;
+
     return IsEqualTo(other);
 }
 
