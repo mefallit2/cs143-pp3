@@ -369,6 +369,36 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (actuals=a)->SetParentAll(this);
 }
 
+Type* Call::GetType() {
+    Decl *d;
+
+    if (base == NULL) {
+        ClassDecl *c = GetClassDecl(scope);
+        if (c == NULL) {
+            if ((d = GetFieldDecl(field, scope)) == NULL)
+                return Type::errorType;
+        } else {
+            if ((d = GetFieldDecl(field, c->GetType())) == NULL)
+                return Type::errorType;
+        }
+    } else {
+        Type *t = base->GetType();
+        if ((d = GetFieldDecl(field, t)) == NULL) {
+
+            if (dynamic_cast<ArrayType*>(t) != NULL &&
+                strcmp("length", field->Name()) == 0)
+                return Type::intType;
+
+            return Type::errorType;
+        }
+    }
+
+    if (dynamic_cast<FnDecl*>(d) == NULL)
+        return Type::errorType;
+
+    return static_cast<FnDecl*>(d)->GetReturnType();
+}
+
 void Call::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 

@@ -225,6 +225,7 @@ class Call : public Expr
   public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
 
+    Type* GetType();
     void BuildScope(Scope *parent);
     void Check();
 
