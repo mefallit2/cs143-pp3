@@ -392,12 +392,14 @@ void Call::Check() {
             if ((d = GetFieldDecl(field, scope)) == NULL) {
                 CheckActuals(d);
                 ReportError::IdentifierNotDeclared(field, LookingForFunction);
+                return;
             }
         } else {
             t = c->GetType();
             if ((d = GetFieldDecl(field, t)) == NULL) {
                 CheckActuals(d);
                 ReportError::IdentifierNotDeclared(field, LookingForFunction);
+                return;
             }
         }
     } else {
@@ -408,15 +410,37 @@ void Call::Check() {
             if (dynamic_cast<ArrayType*>(t) == NULL ||
                 strcmp("length", field->Name()) != 0)
                 ReportError::FieldNotFoundInBase(field, t);
+
+            return;
         }
     }
+
+    CheckActuals(d);
 }
 
 void Call::CheckActuals(Decl *d) {
     for (int i = 0, n = actuals->NumElements(); i < n; ++i)
         actuals->Nth(i)->Check();
 
-    /* TODO: Add type checking of formals vs actuals */
+    FnDecl *fnDecl = dynamic_cast<FnDecl*>(d);
+    if (fnDecl == NULL)
+        return;
+
+    List<VarDecl*> *formals = fnDecl->GetFormals();
+
+    int numExpected = formals->NumElements();
+    int numGiven = actuals->NumElements();
+    if (numExpected != numGiven) {
+        ReportError::NumArgsMismatch(field, numExpected, numGiven);
+        return;
+    }
+
+    for (int i = 0, n = actuals->NumElements(); i < n; ++i) {
+        Type *given = actuals->Nth(i)->GetType();
+        Type *expected = formals->Nth(i)->GetType();
+        if (!given->IsEquivalentTo(expected))
+            ReportError::ArgMismatch(actuals->Nth(i), i+1, given, expected);
+    }
 }
 
 NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {

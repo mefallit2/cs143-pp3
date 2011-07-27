@@ -111,6 +111,7 @@ class FnDecl : public Decl
     bool IsEquivalentTo(Decl *other);
 
     Type* GetReturnType() { return returnType; }
+    List<VarDecl*>* GetFormals() { return formals; }
 
     void BuildScope(Scope *parent);
     void Check();
