@@ -218,6 +218,12 @@ class Call : public Expr
 
   public:
     Call(yyltype loc, Expr *base, Identifier *field, List<Expr*> *args);
+
+    void BuildScope(Scope *parent);
+    void Check();
+
+  private:
+    void CheckActuals(Decl *d);
 };
 
 class NewExpr : public Expr

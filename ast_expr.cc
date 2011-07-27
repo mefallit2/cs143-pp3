@@ -303,6 +303,43 @@ Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
     (actuals=a)->SetParentAll(this);
 }
 
+void Call::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    if (base != NULL)
+        base->BuildScope(scope);
+
+    for (int i = 0, n = actuals->NumElements(); i < n; ++i)
+        actuals->Nth(i)->BuildScope(scope);
+}
+
+void Call::Check() {
+    if (base == NULL) {
+        Decl *d = GetFieldDecl(field, scope);
+        CheckActuals(d);
+
+        if (d == NULL)
+            ReportError::IdentifierNotDeclared(field, LookingForFunction);
+        return;
+    }
+
+    base->Check();
+
+    Type *t = base->GetType();
+    Decl *d = GetFieldDecl(field, t);
+    CheckActuals(d);
+
+    if (d == NULL)
+        ReportError::FieldNotFoundInBase(field, t);
+}
+
+void Call::CheckActuals(Decl *d) {
+    for (int i = 0, n = actuals->NumElements(); i < n; ++i)
+        actuals->Nth(i)->Check();
+
+    /* TODO: Add type checking of formals vs actuals */
+}
+
 NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
   Assert(c != NULL);
   (cType=c)->SetParent(this);
