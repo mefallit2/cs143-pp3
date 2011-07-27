@@ -34,10 +34,14 @@ Decl* Expr::GetFieldDecl(Identifier *f, Type *b) {
         ClassDecl *c = dynamic_cast<ClassDecl*>(d);
 
         Decl *fieldDecl;
-        if (c != NULL && (fieldDecl = GetFieldDecl(f, c->GetScope())) != NULL)
-            return fieldDecl;
-
-        t = c->GetExtends();
+        if (c != NULL) {
+            if ((fieldDecl = GetFieldDecl(f, c->GetScope())) != NULL)
+                return fieldDecl;
+            else
+                t = c->GetExtends();
+        } else {
+            t = NULL;
+        }
     }
 
     return GetFieldDecl(f, scope);
