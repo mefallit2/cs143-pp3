@@ -211,3 +211,24 @@ PrintStmt::PrintStmt(List<Expr*> *a) {
     Assert(a != NULL);
     (args=a)->SetParentAll(this);
 }
+
+void PrintStmt::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    for (int i = 0, n = args->NumElements(); i < n; ++i)
+        args->Nth(i)->BuildScope(scope);
+}
+
+void PrintStmt::Check() {
+    for (int i = 0, n = args->NumElements(); i < n; ++i) {
+        Type *given = args->Nth(i)->GetType();
+
+        if (!(given->IsEquivalentTo(Type::intType) ||
+              given->IsEquivalentTo(Type::boolType) ||
+              given->IsEquivalentTo(Type::stringType)))
+            ReportError::PrintArgMismatch(args->Nth(i), i+1, given);
+    }
+
+    for (int i = 0, n = args->NumElements(); i < n; ++i)
+        args->Nth(i)->Check();
+}

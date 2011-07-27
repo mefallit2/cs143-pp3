@@ -176,6 +176,9 @@ class PrintStmt : public Stmt
 
   public:
     PrintStmt(List<Expr*> *arguments);
+
+    void BuildScope(Scope *parent);
+    void Check();
 };
 
 #endif
