@@ -250,20 +250,31 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 }
 
 Type* FieldAccess::GetType() {
-    if (base == NULL) {
-        VarDecl *d = dynamic_cast<VarDecl*>(GetFieldDecl(field, scope));
-        if (d == NULL)
-            return Type::errorType;
+    Decl *d;
+    ClassDecl *c;
+    Type *t;
 
-        return d->GetType();
+    c = GetClassDecl(scope);
+
+    if (base == NULL) {
+        if (c == NULL) {
+            d = GetFieldDecl(field, scope);
+        } else {
+            t = c->GetType();
+            d = GetFieldDecl(field, t);
+        }
+    } else {
+        t = base->GetType();
+        d = GetFieldDecl(field, t);
     }
 
-    Type *t = base->GetType();
-    VarDecl *d = dynamic_cast<VarDecl*>(GetFieldDecl(field, t));
     if (d == NULL)
         return Type::errorType;
 
-    return d->GetType();
+    if (dynamic_cast<VarDecl*>(d) == NULL)
+        return Type::errorType;
+
+    return static_cast<VarDecl*>(d)->GetType();
 }
 
 void FieldAccess::BuildScope(Scope *parent) {
@@ -274,24 +285,27 @@ void FieldAccess::BuildScope(Scope *parent) {
 }
 
 void FieldAccess::Check() {
+    if (base != NULL)
+        base->Check();
+
+    Type *t;
+
     if (base == NULL) {
-        if (GetFieldDecl(field, scope) == NULL)
-            ReportError::IdentifierNotDeclared(field, LookingForVariable);
-        return;
-    }
-
-    base->Check();
-
-    Type *t = base->GetType();
-
-    if (GetFieldDecl(field, t) == NULL) {
-        ReportError::FieldNotFoundInBase(field, t);
-        return;
-    }
-
-    if (GetClassDecl(scope) == NULL) {
-        ReportError::InaccessibleField(field, t);
-        return;
+        ClassDecl *c = GetClassDecl(scope);
+        if (c == NULL) {
+            if (GetFieldDecl(field, scope) == NULL)
+                ReportError::IdentifierNotDeclared(field, LookingForVariable);
+        } else {
+            t = c->GetType();
+            if (GetFieldDecl(field, t) == NULL)
+                ReportError::FieldNotFoundInBase(field, t);
+        }
+    } else {
+        t = base->GetType();
+        if (GetFieldDecl(field, t) == NULL)
+            ReportError::FieldNotFoundInBase(field, t);
+        else if (GetClassDecl(scope) == NULL)
+            ReportError::InaccessibleField(field, t);
     }
 }
 
@@ -314,23 +328,33 @@ void Call::BuildScope(Scope *parent) {
 }
 
 void Call::Check() {
+    if (base != NULL)
+        base->Check();
+
+    Decl *d;
+    Type *t;
+
     if (base == NULL) {
-        Decl *d = GetFieldDecl(field, scope);
-        CheckActuals(d);
-
-        if (d == NULL)
-            ReportError::IdentifierNotDeclared(field, LookingForFunction);
-        return;
+        ClassDecl *c = GetClassDecl(scope);
+        if (c == NULL) {
+            if ((d = GetFieldDecl(field, scope)) == NULL) {
+                CheckActuals(d);
+                ReportError::IdentifierNotDeclared(field, LookingForFunction);
+            }
+        } else {
+            t = c->GetType();
+            if ((d = GetFieldDecl(field, t)) == NULL) {
+                CheckActuals(d);
+                ReportError::IdentifierNotDeclared(field, LookingForFunction);
+            }
+        }
+    } else {
+        t = base->GetType();
+        if ((d = GetFieldDecl(field, t)) == NULL) {
+            CheckActuals(d);
+            ReportError::FieldNotFoundInBase(field, t);
+        }
     }
-
-    base->Check();
-
-    Type *t = base->GetType();
-    Decl *d = GetFieldDecl(field, t);
-    CheckActuals(d);
-
-    if (d == NULL)
-        ReportError::FieldNotFoundInBase(field, t);
 }
 
 void Call::CheckActuals(Decl *d) {

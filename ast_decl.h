@@ -16,9 +16,9 @@
 #include "ast.h"
 #include "list.h"
 #include "ast_stmt.h"
+#include "ast_type.h"
 
 class Type;
-class NamedType;
 class Identifier;
 class Stmt;
 class InterfaceDecl;
@@ -74,6 +74,7 @@ class ClassDecl : public Decl
     void BuildScope(Scope *parent);
     void Check();
 
+    NamedType *GetType() { return new NamedType(id); }
     NamedType* GetExtends() { return extends; }
 
   private:

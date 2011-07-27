@@ -15,12 +15,12 @@
 #include "list.h"
 #include "ast.h"
 #include "hashtable.h"
+#include "ast_type.h"
 
 class Decl;
 class VarDecl;
 class Expr;
 class Type;
-class NamedType;
 class ClassDecl;
 
 class Scope
