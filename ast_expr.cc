@@ -117,9 +117,9 @@ void CompoundExpr::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 
     if (left != NULL)
-        left->BuildScope(parent);
+        left->BuildScope(scope);
 
-    right->BuildScope(parent);
+    right->BuildScope(scope);
 }
 
 void CompoundExpr::Check() {
@@ -225,8 +225,8 @@ Type* ArrayAccess::GetType() {
 void ArrayAccess::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 
-    base->BuildScope(parent);
-    subscript->BuildScope(parent);
+    base->BuildScope(scope);
+    subscript->BuildScope(scope);
 }
 
 void ArrayAccess::Check() {
@@ -270,7 +270,7 @@ void FieldAccess::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 
     if (base != NULL)
-        base->BuildScope(parent);
+        base->BuildScope(scope);
 }
 
 void FieldAccess::Check() {
@@ -321,7 +321,7 @@ Type* NewArrayExpr::GetType() {
 void NewArrayExpr::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 
-    size->BuildScope(parent);
+    size->BuildScope(scope);
 }
 
 void NewArrayExpr::Check() {
