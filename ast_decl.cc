@@ -80,6 +80,9 @@ void ClassDecl::BuildScope(Scope *parent) {
 }
 
 void ClassDecl::Check() {
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        members->Nth(i)->Check();
+
     CheckExtends();
     CheckImplements();
 
