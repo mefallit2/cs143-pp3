@@ -19,6 +19,7 @@
 class NamedType; // for new
 class Type; // for NewArray
 class FnDecl;
+class ClassDecl;
 
 class Expr : public Stmt
 {
@@ -27,9 +28,9 @@ class Expr : public Stmt
     Expr() : Stmt() {}
 
     virtual Type* GetType();
-    bool IsInClassScope();
 
   protected:
+    ClassDecl* GetClassDecl(Scope *s);
     Decl* GetFieldDecl(Identifier *field, Type *base);
     Decl* GetFieldDecl(Identifier *field, Scope *scope);
 };

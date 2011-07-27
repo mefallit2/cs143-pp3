@@ -15,15 +15,15 @@ Type* Expr::GetType() {
     return Type::errorType;
 }
 
-bool Expr::IsInClassScope() {
-    Scope *s = scope;
+ClassDecl* Expr::GetClassDecl(Scope *s) {
     while (s != NULL) {
-        if (s->GetClassScope())
-            return true;
+        ClassDecl *d;
+        if ((d = s->GetClassDecl()) != NULL)
+            return d;
         s = s->GetParent();
     }
 
-    return false;
+    return NULL;
 }
 
 Decl* Expr::GetFieldDecl(Identifier *f, Type *b) {
@@ -205,7 +205,7 @@ void AssignExpr::Check() {
 }
 
 void This::Check() {
-    if (!IsInClassScope())
+    if (GetClassDecl(scope) == NULL)
         ReportError::ThisOutsideClassScope(this);
 }
 
@@ -289,7 +289,7 @@ void FieldAccess::Check() {
         return;
     }
 
-    if (!IsInClassScope()) {
+    if (GetClassDecl(scope) == NULL) {
         ReportError::InaccessibleField(field, t);
         return;
     }

@@ -21,6 +21,7 @@ class VarDecl;
 class Expr;
 class Type;
 class NamedType;
+class ClassDecl;
 
 class Scope
 {
@@ -29,15 +30,15 @@ class Scope
 
   public:
     Hashtable<Decl*> *table;
-    bool isClassScope;
+    ClassDecl* classDecl;
 
   public:
-    Scope() : table(new Hashtable<Decl*>), isClassScope(false) {}
+    Scope() : table(new Hashtable<Decl*>), classDecl(NULL) {}
 
     void SetParent(Scope *p) { parent = p; }
     Scope* GetParent() { return parent; }
-    void SetClassScope(bool b) { isClassScope = b; }
-    bool GetClassScope() { return isClassScope; }
+    void SetClassDecl(ClassDecl *d) { classDecl = d; }
+    ClassDecl* GetClassDecl() { return classDecl; }
     int AddDecl(Decl *decl);
     friend ostream& operator<<(ostream& out, Scope *s);
 };
