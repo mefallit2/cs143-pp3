@@ -15,6 +15,17 @@ Type* Expr::GetType() {
     return Type::errorType;
 }
 
+bool Expr::IsInClassScope() {
+    Scope *s = scope;
+    while (s != NULL) {
+        if (s->GetClassScope())
+            return true;
+        s = s->GetParent();
+    }
+
+    return false;
+}
+
 IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
 }
@@ -165,14 +176,8 @@ void AssignExpr::Check() {
 }
 
 void This::Check() {
-    Scope *s = scope;
-    while (s != NULL) {
-        if (s->GetClassScope())
-            return;
-        s = s->GetParent();
-    }
-
-    ReportError::ThisOutsideClassScope(this);
+    if (!IsInClassScope())
+        ReportError::ThisOutsideClassScope(this);
 }
 
 ArrayAccess::ArrayAccess(yyltype loc, Expr *b, Expr *s) : LValue(loc) {
@@ -216,13 +221,54 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 }
 
 Type* FieldAccess::GetType() {
-    if (base != NULL) // TODO: Add proper handling when base != NULL
+    if (base == NULL)
+        return GetFieldTypeInScope(scope);
+
+    Type *t = base->GetType();
+    Decl *d = Program::gScope->table->Lookup(t->Name());
+    if (d == NULL)
         return Type::errorType;
 
-    Scope *s = scope;
+    return GetFieldTypeInScope(d->GetScope());
+}
+
+void FieldAccess::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    if (base != NULL)
+        base->BuildScope(parent);
+}
+
+void FieldAccess::Check() {
+    if (base == NULL) {
+        if (GetFieldTypeInScope(scope)->IsEqualTo(Type::errorType))
+            ReportError::IdentifierNotDeclared(field, LookingForVariable);
+        return;
+    }
+
+    base->Check();
+
+    Type *t = base->GetType();
+    Decl *d = Program::gScope->table->Lookup(t->Name());
+    if (d == NULL) {
+        ReportError::FieldNotFoundInBase(field, t);
+        return;
+    }
+
+    if (!IsInClassScope()) {
+        ReportError::InaccessibleField(field, t);
+        return;
+    }
+
+    if (GetFieldTypeInScope(d->GetScope())->IsEqualTo(Type::errorType))
+        ReportError::FieldNotFoundInBase(field, t);
+}
+
+Type* FieldAccess::GetFieldTypeInScope(Scope *s) {
     while (s != NULL) {
         Decl *lookup;
         VarDecl *varDecl;
+
         if ((lookup = s->table->Lookup(field->Name())) != NULL &&
             (varDecl = dynamic_cast<VarDecl*>(lookup)) != NULL)
             return varDecl->GetType();
@@ -231,13 +277,6 @@ Type* FieldAccess::GetType() {
     }
 
     return Type::errorType;
-}
-
-void FieldAccess::BuildScope(Scope *parent) {
-    scope->SetParent(parent);
-
-    if (base != NULL)
-        base->BuildScope(parent);
 }
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {

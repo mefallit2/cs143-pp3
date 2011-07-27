@@ -26,6 +26,7 @@ class Expr : public Stmt
     Expr() : Stmt() {}
 
     virtual Type* GetType();
+    bool IsInClassScope();
 };
 
 /* This node type is used for those places where an expression is optional.
@@ -196,6 +197,10 @@ class FieldAccess : public LValue
 
     Type* GetType();
     void BuildScope(Scope *parent);
+    void Check();
+
+  private:
+    Type* GetFieldTypeInScope(Scope *s);
 };
 
 /* Like field access, call is used both for qualified base.field()
