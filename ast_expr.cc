@@ -241,6 +241,25 @@ void EqualityExpr::Check() {
         ReportError::IncompatibleOperands(op, ltype, rtype);
 }
 
+Type* LogicalExpr::GetType() {
+    Type *rtype = right->GetType();
+
+    if (left == NULL) {
+        if (rtype->IsEquivalentTo(Type::boolType))
+            return Type::boolType;
+        else
+            return Type::errorType;
+    }
+
+    Type *ltype = left->GetType();
+
+    if (ltype->IsEquivalentTo(Type::boolType) &&
+        rtype->IsEquivalentTo(Type::boolType))
+        return Type::boolType;
+
+    return Type::errorType;
+}
+
 void LogicalExpr::Check() {
     if (left != NULL)
         left->Check();
