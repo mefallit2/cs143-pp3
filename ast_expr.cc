@@ -391,25 +391,37 @@ void FieldAccess::Check() {
     if (base != NULL)
         base->Check();
 
+    Decl *d;
     Type *t;
 
     if (base == NULL) {
         ClassDecl *c = GetClassDecl(scope);
         if (c == NULL) {
-            if (GetFieldDecl(field, scope) == NULL)
+            if ((d = GetFieldDecl(field, scope)) == NULL) {
                 ReportError::IdentifierNotDeclared(field, LookingForVariable);
+                return;
+            }
         } else {
             t = c->GetType();
-            if (GetFieldDecl(field, t) == NULL)
+            if ((d = GetFieldDecl(field, t)) == NULL) {
                 ReportError::FieldNotFoundInBase(field, t);
+                return;
+            }
         }
     } else {
         t = base->GetType();
-        if (GetFieldDecl(field, t) == NULL)
+        if ((d = GetFieldDecl(field, t)) == NULL) {
             ReportError::FieldNotFoundInBase(field, t);
-        else if (GetClassDecl(scope) == NULL)
+            return;
+        }
+        else if (GetClassDecl(scope) == NULL) {
             ReportError::InaccessibleField(field, t);
+            return;
+        }
     }
+
+    if (dynamic_cast<VarDecl*>(d) == NULL)
+        ReportError::IdentifierNotDeclared(field, LookingForVariable);
 }
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
