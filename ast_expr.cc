@@ -356,7 +356,10 @@ void Call::Check() {
         t = base->GetType();
         if ((d = GetFieldDecl(field, t)) == NULL) {
             CheckActuals(d);
-            ReportError::FieldNotFoundInBase(field, t);
+
+            if (dynamic_cast<ArrayType*>(t) == NULL ||
+                strcmp("length", field->Name()) != 0)
+                ReportError::FieldNotFoundInBase(field, t);
         }
     }
 }
