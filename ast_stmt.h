@@ -22,6 +22,7 @@ class VarDecl;
 class Expr;
 class Type;
 class ClassDecl;
+class LoopStmt;
 
 class Scope
 {
@@ -30,15 +31,21 @@ class Scope
 
   public:
     Hashtable<Decl*> *table;
-    ClassDecl* classDecl;
+    ClassDecl *classDecl;
+    LoopStmt *loopStmt;
 
   public:
-    Scope() : table(new Hashtable<Decl*>), classDecl(NULL) {}
+    Scope() : table(new Hashtable<Decl*>), classDecl(NULL), loopStmt(NULL) {}
 
     void SetParent(Scope *p) { parent = p; }
     Scope* GetParent() { return parent; }
+
     void SetClassDecl(ClassDecl *d) { classDecl = d; }
     ClassDecl* GetClassDecl() { return classDecl; }
+
+    void SetLoopStmt(LoopStmt *s) { loopStmt = s; }
+    LoopStmt* GetLoopStmt() { return loopStmt; }
+
     int AddDecl(Decl *decl);
     friend ostream& operator<<(ostream& out, Scope *s);
 };
@@ -96,8 +103,8 @@ class ConditionalStmt : public Stmt
   public:
     ConditionalStmt(Expr *testExpr, Stmt *body);
 
-    void BuildScope(Scope *parent);
-    void Check();
+    virtual void BuildScope(Scope *parent);
+    virtual void Check();
 };
 
 class LoopStmt : public ConditionalStmt
@@ -105,6 +112,8 @@ class LoopStmt : public ConditionalStmt
   public:
     LoopStmt(Expr *testExpr, Stmt *body)
             : ConditionalStmt(testExpr, body) {}
+
+    virtual void BuildScope(Scope *parent);
 };
 
 class ForStmt : public LoopStmt
@@ -120,9 +129,6 @@ class WhileStmt : public LoopStmt
 {
   public:
     WhileStmt(Expr *test, Stmt *body) : LoopStmt(test, body) {}
-
-    void BuildScope(Scope *parent) { ConditionalStmt::BuildScope(parent); }
-    void Check() { ConditionalStmt::Check(); }
 };
 
 class IfStmt : public ConditionalStmt
@@ -141,6 +147,8 @@ class BreakStmt : public Stmt
 {
   public:
     BreakStmt(yyltype loc) : Stmt(loc) {}
+
+    void Check();
 };
 
 class ReturnStmt : public Stmt

@@ -118,6 +118,14 @@ void ConditionalStmt::Check() {
         ReportError::TestNotBoolean(test);
 }
 
+void LoopStmt::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+    scope->SetLoopStmt(this);
+
+    test->BuildScope(scope);
+    body->BuildScope(scope);
+}
+
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
     Assert(i != NULL && t != NULL && s != NULL && b != NULL);
     (init=i)->SetParent(this);
@@ -149,6 +157,18 @@ void IfStmt::Check() {
 
     if (elseBody != NULL)
         elseBody->Check();
+}
+
+void BreakStmt::Check() {
+    Scope *s = scope;
+    while (s != NULL) {
+        if (s->GetLoopStmt() != NULL)
+            return;
+
+        s = s->GetParent();
+    }
+
+    ReportError::BreakOutsideLoop(this);
 }
 
 ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
