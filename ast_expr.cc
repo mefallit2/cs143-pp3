@@ -192,7 +192,8 @@ Type* EqualityExpr::GetType() {
     Type *rtype = right->GetType();
     Type *ltype = left->GetType();
 
-    if (!rtype->IsEqualTo(ltype))
+    if (!rtype->IsEquivalentTo(ltype) &&
+        !ltype->IsEquivalentTo(rtype))
         return Type::errorType;
 
    return Type::boolType;
@@ -205,7 +206,8 @@ void EqualityExpr::Check() {
     Type *rtype = right->GetType();
     Type *ltype = left->GetType();
 
-    if (!rtype->IsEqualTo(ltype))
+    if (!rtype->IsEquivalentTo(ltype) &&
+        !ltype->IsEquivalentTo(rtype))
         ReportError::IncompatibleOperands(op, ltype, rtype);
 }
 
