@@ -104,11 +104,18 @@ ConditionalStmt::ConditionalStmt(Expr *t, Stmt *b) {
 }
 
 void ConditionalStmt::BuildScope(Scope *parent) {
-    body->BuildScope(parent);
+    scope->SetParent(parent);
+
+    test->BuildScope(scope);
+    body->BuildScope(scope);
 }
 
 void ConditionalStmt::Check() {
+    test->Check();
     body->Check();
+
+    if (!test->GetType()->IsEquivalentTo(Type::boolType))
+        ReportError::TestNotBoolean(test);
 }
 
 ForStmt::ForStmt(Expr *i, Expr *t, Expr *s, Stmt *b): LoopStmt(t, b) {
