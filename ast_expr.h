@@ -18,6 +18,7 @@
 
 class NamedType; // for new
 class Type; // for NewArray
+class FnDecl;
 
 class Expr : public Stmt
 {
@@ -27,6 +28,10 @@ class Expr : public Stmt
 
     virtual Type* GetType();
     bool IsInClassScope();
+
+  protected:
+    Decl* GetFieldDecl(Identifier *field, Type *base);
+    Decl* GetFieldDecl(Identifier *field, Scope *scope);
 };
 
 /* This node type is used for those places where an expression is optional.
@@ -198,9 +203,6 @@ class FieldAccess : public LValue
     Type* GetType();
     void BuildScope(Scope *parent);
     void Check();
-
-  private:
-    Type* GetFieldTypeInScope(Scope *s);
 };
 
 /* Like field access, call is used both for qualified base.field()

@@ -26,6 +26,35 @@ bool Expr::IsInClassScope() {
     return false;
 }
 
+Decl* Expr::GetFieldDecl(Identifier *f, Type *b) {
+    NamedType *t = dynamic_cast<NamedType*>(b);
+
+    while (t != NULL) {
+        Decl *d = Program::gScope->table->Lookup(t->Name());
+        ClassDecl *c = dynamic_cast<ClassDecl*>(d);
+
+        Decl *fieldDecl;
+        if (c != NULL && (fieldDecl = GetFieldDecl(f, c->GetScope())) != NULL)
+            return fieldDecl;
+
+        t = c->GetExtends();
+    }
+
+    return GetFieldDecl(f, scope);
+}
+
+Decl* Expr::GetFieldDecl(Identifier *f, Scope *s) {
+    while (s != NULL) {
+        Decl *lookup;
+        if ((lookup = s->table->Lookup(f->Name())) != NULL)
+            return lookup;
+
+        s = s->GetParent();
+    }
+
+    return NULL;
+}
+
 IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
     value = val;
 }
@@ -221,15 +250,20 @@ FieldAccess::FieldAccess(Expr *b, Identifier *f)
 }
 
 Type* FieldAccess::GetType() {
-    if (base == NULL)
-        return GetFieldTypeInScope(scope);
+    if (base == NULL) {
+        VarDecl *d = dynamic_cast<VarDecl*>(GetFieldDecl(field, scope));
+        if (d == NULL)
+            return Type::errorType;
+
+        return d->GetType();
+    }
 
     Type *t = base->GetType();
-    Decl *d = Program::gScope->table->Lookup(t->Name());
+    VarDecl *d = dynamic_cast<VarDecl*>(GetFieldDecl(field, t));
     if (d == NULL)
         return Type::errorType;
 
-    return GetFieldTypeInScope(d->GetScope());
+    return d->GetType();
 }
 
 void FieldAccess::BuildScope(Scope *parent) {
@@ -241,7 +275,7 @@ void FieldAccess::BuildScope(Scope *parent) {
 
 void FieldAccess::Check() {
     if (base == NULL) {
-        if (GetFieldTypeInScope(scope)->IsEqualTo(Type::errorType))
+        if (GetFieldDecl(field, scope) == NULL)
             ReportError::IdentifierNotDeclared(field, LookingForVariable);
         return;
     }
@@ -249,8 +283,8 @@ void FieldAccess::Check() {
     base->Check();
 
     Type *t = base->GetType();
-    Decl *d = Program::gScope->table->Lookup(t->Name());
-    if (d == NULL) {
+
+    if (GetFieldDecl(field, t) == NULL) {
         ReportError::FieldNotFoundInBase(field, t);
         return;
     }
@@ -259,24 +293,6 @@ void FieldAccess::Check() {
         ReportError::InaccessibleField(field, t);
         return;
     }
-
-    if (GetFieldTypeInScope(d->GetScope())->IsEqualTo(Type::errorType))
-        ReportError::FieldNotFoundInBase(field, t);
-}
-
-Type* FieldAccess::GetFieldTypeInScope(Scope *s) {
-    while (s != NULL) {
-        Decl *lookup;
-        VarDecl *varDecl;
-
-        if ((lookup = s->table->Lookup(field->Name())) != NULL &&
-            (varDecl = dynamic_cast<VarDecl*>(lookup)) != NULL)
-            return varDecl->GetType();
-
-        s = s->GetParent();
-    }
-
-    return Type::errorType;
 }
 
 Call::Call(yyltype loc, Expr *b, Identifier *f, List<Expr*> *a) : Expr(loc)  {
