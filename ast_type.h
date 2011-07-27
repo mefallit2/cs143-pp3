@@ -56,6 +56,7 @@ class NamedType : public Type
 
     const char* Name() { return id->Name(); }
     bool IsPrimitive() { return false; }
+    Identifier* GetId() { return id; }
 };
 
 class ArrayType : public Type

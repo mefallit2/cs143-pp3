@@ -541,6 +541,24 @@ NewExpr::NewExpr(yyltype loc, NamedType *c) : Expr(loc) {
   (cType=c)->SetParent(this);
 }
 
+Type* NewExpr::GetType() {
+    Decl *d = Program::gScope->table->Lookup(cType->Name());
+    ClassDecl *c = dynamic_cast<ClassDecl*>(d);
+
+    if (c == NULL)
+        return Type::errorType;
+
+    return c->GetType();
+}
+
+void NewExpr::Check() {
+    Decl *d = Program::gScope->table->Lookup(cType->Name());
+    ClassDecl *c = dynamic_cast<ClassDecl*>(d);
+
+    if (c == NULL)
+        ReportError::IdentifierNotDeclared(cType->GetId(), LookingForClass);
+}
+
 NewArrayExpr::NewArrayExpr(yyltype loc, Expr *sz, Type *et) : Expr(loc) {
     Assert(sz != NULL && et != NULL);
     (size=sz)->SetParent(this);
