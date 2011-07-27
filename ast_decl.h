@@ -110,6 +110,8 @@ class FnDecl : public Decl
 
     bool IsEquivalentTo(Decl *other);
 
+    Type* GetReturnType() { return returnType; }
+
     void BuildScope(Scope *parent);
     void Check();
 };

@@ -176,6 +176,37 @@ ReturnStmt::ReturnStmt(yyltype loc, Expr *e) : Stmt(loc) {
     (expr=e)->SetParent(this);
 }
 
+void ReturnStmt::BuildScope(Scope *parent) {
+    scope->SetParent(parent);
+
+    expr->BuildScope(scope);
+}
+
+void ReturnStmt::Check() {
+    expr->Check();
+
+    FnDecl *d = NULL;
+    Scope *s = scope;
+    while (s != NULL) {
+        if ((d = s->GetFnDecl()) != NULL)
+            break;
+
+        s = s->GetParent();
+    }
+
+    if (d == NULL) {
+        ReportError::Formatted(location,
+                               "return is only allowed inside a function");
+        return;
+    }
+
+    Type *expected = d->GetReturnType();
+    Type *given = expr->GetType();
+
+    if (!given->IsEquivalentTo(expected))
+        ReportError::ReturnMismatch(this, given, expected);
+}
+
 PrintStmt::PrintStmt(List<Expr*> *a) {
     Assert(a != NULL);
     (args=a)->SetParentAll(this);

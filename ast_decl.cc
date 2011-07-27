@@ -200,6 +200,7 @@ bool FnDecl::IsEquivalentTo(Decl *other) {
 
 void FnDecl::BuildScope(Scope *parent) {
     scope->SetParent(parent);
+    scope->SetFnDecl(this);
 
     for (int i = 0, n = formals->NumElements(); i < n; ++i)
         scope->AddDecl(formals->Nth(i));

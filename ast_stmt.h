@@ -23,6 +23,7 @@ class Expr;
 class Type;
 class ClassDecl;
 class LoopStmt;
+class FnDecl;
 
 class Scope
 {
@@ -33,9 +34,11 @@ class Scope
     Hashtable<Decl*> *table;
     ClassDecl *classDecl;
     LoopStmt *loopStmt;
+    FnDecl *fnDecl;
 
   public:
-    Scope() : table(new Hashtable<Decl*>), classDecl(NULL), loopStmt(NULL) {}
+    Scope() : table(new Hashtable<Decl*>), classDecl(NULL), loopStmt(NULL),
+              fnDecl(NULL) {}
 
     void SetParent(Scope *p) { parent = p; }
     Scope* GetParent() { return parent; }
@@ -45,6 +48,9 @@ class Scope
 
     void SetLoopStmt(LoopStmt *s) { loopStmt = s; }
     LoopStmt* GetLoopStmt() { return loopStmt; }
+
+    void SetFnDecl(FnDecl *d) { fnDecl = d; }
+    FnDecl* GetFnDecl() { return fnDecl; }
 
     int AddDecl(Decl *decl);
     friend ostream& operator<<(ostream& out, Scope *s);
@@ -158,6 +164,9 @@ class ReturnStmt : public Stmt
 
   public:
     ReturnStmt(yyltype loc, Expr *expr);
+
+    void BuildScope(Scope *parent);
+    void Check();
 };
 
 class PrintStmt : public Stmt
