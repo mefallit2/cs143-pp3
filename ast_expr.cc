@@ -171,7 +171,8 @@ void ArithmeticExpr::Check() {
             return;
         else
             ReportError::IncompatibleOperand(op, rtype);
-            return;
+
+        return;
     }
 
     Type *ltype = left->GetType();

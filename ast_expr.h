@@ -115,8 +115,8 @@ class CompoundExpr : public Expr
     CompoundExpr(Expr *lhs, Operator *op, Expr *rhs); // for binary
     CompoundExpr(Operator *op, Expr *rhs);             // for unary
 
-    void BuildScope(Scope *parent);
-    void Check();
+    virtual void BuildScope(Scope *parent);
+    virtual void Check();
 };
 
 class ArithmeticExpr : public CompoundExpr
