@@ -133,6 +133,9 @@ class RelationalExpr : public CompoundExpr
 {
   public:
     RelationalExpr(Expr *lhs, Operator *op, Expr *rhs) : CompoundExpr(lhs,op,rhs) {}
+
+    Type* GetType();
+    void Check();
 };
 
 class EqualityExpr : public CompoundExpr

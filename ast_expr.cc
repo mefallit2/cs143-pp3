@@ -188,6 +188,36 @@ void ArithmeticExpr::Check() {
     ReportError::IncompatibleOperands(op, ltype, rtype);
 }
 
+Type* RelationalExpr::GetType() {
+    Type *rtype = right->GetType();
+    Type *ltype = left->GetType();
+
+    if (ltype->IsEquivalentTo(Type::intType) &&
+        rtype->IsEquivalentTo(Type::intType))
+        return Type::errorType;
+
+    if (ltype->IsEquivalentTo(Type::doubleType) &&
+        rtype->IsEquivalentTo(Type::doubleType))
+        return Type::errorType;
+
+    return Type::boolType;
+}
+
+void RelationalExpr::Check() {
+    Type *rtype = right->GetType();
+    Type *ltype = left->GetType();
+
+    if (ltype->IsEquivalentTo(Type::intType) &&
+        rtype->IsEquivalentTo(Type::intType))
+        return;
+
+    if (ltype->IsEquivalentTo(Type::doubleType) &&
+        rtype->IsEquivalentTo(Type::doubleType))
+        return;
+
+    ReportError::IncompatibleOperands(op, ltype, rtype);
+}
+
 Type* EqualityExpr::GetType() {
     Type *rtype = right->GetType();
     Type *ltype = left->GetType();
