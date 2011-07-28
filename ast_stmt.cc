@@ -64,12 +64,6 @@ void Stmt::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 }
 
-void Stmt::Check() {
-    /* TODO: Once all sublcasses support this function it should be made a pure
-     * virtual function.
-     */
-}
-
 StmtBlock::StmtBlock(List<VarDecl*> *d, List<Stmt*> *s) {
     Assert(d != NULL && s != NULL);
     (decls=d)->SetParentAll(this);

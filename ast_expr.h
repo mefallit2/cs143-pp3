@@ -42,6 +42,7 @@ class EmptyExpr : public Expr
 {
   public:
     Type* GetType();
+    void Check() {}
 };
 
 class IntConstant : public Expr
@@ -53,6 +54,7 @@ class IntConstant : public Expr
     IntConstant(yyltype loc, int val);
 
     Type* GetType();
+    void Check() {}
 };
 
 class DoubleConstant : public Expr
@@ -64,6 +66,7 @@ class DoubleConstant : public Expr
     DoubleConstant(yyltype loc, double val);
 
     Type* GetType();
+    void Check() {}
 };
 
 class BoolConstant : public Expr
@@ -75,6 +78,7 @@ class BoolConstant : public Expr
     BoolConstant(yyltype loc, bool val);
 
     Type* GetType();
+    void Check() {}
 };
 
 class StringConstant : public Expr
@@ -86,6 +90,7 @@ class StringConstant : public Expr
     StringConstant(yyltype loc, const char *val);
 
     Type* GetType();
+    void Check() {}
 };
 
 class NullConstant: public Expr
@@ -94,6 +99,7 @@ class NullConstant: public Expr
     NullConstant(yyltype loc) : Expr(loc) {}
 
     Type* GetType();
+    void Check() {}
 };
 
 class Operator : public Node
@@ -271,6 +277,7 @@ class ReadIntegerExpr : public Expr
     ReadIntegerExpr(yyltype loc) : Expr(loc) {}
 
     Type* GetType();
+    void Check() {}
 };
 
 class ReadLineExpr : public Expr
@@ -279,6 +286,7 @@ class ReadLineExpr : public Expr
     ReadLineExpr(yyltype loc) : Expr (loc) {}
 
     Type* GetType();
+    void Check() {}
 };
 
 #endif

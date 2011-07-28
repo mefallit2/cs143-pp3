@@ -82,7 +82,7 @@ class Stmt : public Node
      Stmt(yyltype loc) : Node(loc), scope(new Scope) {}
 
      virtual void BuildScope(Scope *parent);
-     virtual void Check();
+     virtual void Check() = 0;
 };
 
 class StmtBlock : public Stmt
