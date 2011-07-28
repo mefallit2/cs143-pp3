@@ -51,8 +51,13 @@ void VarDecl::CheckType() {
 
     Scope *s = scope;
     while (s != NULL) {
-        if (s->table->Lookup(type->Name()) != NULL)
+        Decl *d;
+        if ((d = s->table->Lookup(type->Name())) != NULL) {
+            if (dynamic_cast<ClassDecl*>(d) == NULL)
+                type->ReportNotDeclaredIdentifier(LookingForType);
+
             return;
+        }
         s = s->GetParent();
     }
 
