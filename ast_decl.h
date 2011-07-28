@@ -74,8 +74,9 @@ class ClassDecl : public Decl
     void BuildScope(Scope *parent);
     void Check();
 
-    NamedType *GetType() { return new NamedType(id); }
+    NamedType* GetType() { return new NamedType(id); }
     NamedType* GetExtends() { return extends; }
+    List<NamedType*>* GetImplements() { return implements; }
 
   private:
     void CheckExtends();

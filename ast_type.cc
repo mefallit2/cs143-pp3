@@ -67,6 +67,12 @@ bool NamedType::IsEquivalentTo(Type *other) {
         if (c == NULL)
             return false;
 
+        List<NamedType*> *imps = c->GetImplements();
+        for (int i = 0, n = imps->NumElements(); i < n; ++i) {
+            if (imps->Nth(i)->IsEqualTo(other))
+                return true;
+        }
+
         nType = c->GetExtends();
         if (nType == NULL)
             break;
