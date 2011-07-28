@@ -8,13 +8,6 @@
 #include "ast_type.h"
 #include "ast_decl.h"
 
-Type* Expr::GetType() {
-    /* TODO: Once all sublcasses support this function it should be made a pure
-    * virtual function.
-    */
-    return Type::errorType;
-}
-
 ClassDecl* Expr::GetClassDecl(Scope *s) {
     while (s != NULL) {
         ClassDecl *d;
@@ -63,6 +56,10 @@ Decl* Expr::GetFieldDecl(Identifier *f, Scope *s) {
     }
 
     return NULL;
+}
+
+Type* EmptyExpr::GetType() {
+    return Type::errorType;
 }
 
 IntConstant::IntConstant(yyltype loc, int val) : Expr(loc) {
@@ -311,6 +308,14 @@ void AssignExpr::Check() {
 
     if (!rtype->IsEquivalentTo(ltype) && !ltype->IsEqualTo(Type::errorType))
         ReportError::IncompatibleOperands(op, ltype, rtype);
+}
+
+Type* This::GetType() {
+    ClassDecl *d = GetClassDecl(scope);
+    if (d == NULL)
+        return Type::errorType;
+
+    return d->GetType();
 }
 
 void This::Check() {

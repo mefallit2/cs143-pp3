@@ -27,7 +27,7 @@ class Expr : public Stmt
     Expr(yyltype loc) : Stmt(loc) {}
     Expr() : Stmt() {}
 
-    virtual Type* GetType();
+    virtual Type* GetType() = 0;
 
   protected:
     ClassDecl* GetClassDecl(Scope *s);
@@ -41,6 +41,7 @@ class Expr : public Stmt
 class EmptyExpr : public Expr
 {
   public:
+    Type* GetType();
 };
 
 class IntConstant : public Expr
@@ -180,6 +181,7 @@ class This : public Expr
   public:
     This(yyltype loc) : Expr(loc) {}
 
+    Type* GetType();
     void Check();
 };
 
