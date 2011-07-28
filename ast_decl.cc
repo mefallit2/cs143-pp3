@@ -188,7 +188,7 @@ void ClassDecl::CheckImplementsInterfaces() {
                     break;
 
                 if (classDecl->GetExtends() == NULL) {
-                    classDecl == NULL;
+                    classDecl = NULL;
                 } else {
                     const char *extName = classDecl->GetExtends()->Name();
                     Decl *ext = Program::gScope->table->Lookup(extName);
