@@ -303,7 +303,7 @@ void AssignExpr::Check() {
     Type *ltype = left->GetType();
     Type *rtype = right->GetType();
 
-    if (!rtype->IsEquivalentTo(ltype))
+    if (!rtype->IsEquivalentTo(ltype) && !ltype->IsEqualTo(Type::errorType))
         ReportError::IncompatibleOperands(op, ltype, rtype);
 }
 
