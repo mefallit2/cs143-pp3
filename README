@@ -2,35 +2,44 @@
 * CS 143 - Compilers - Summer 2011 *
 ************************************
 
-Programming Project 2: Syntax Analysis
---------------------------------------
+Programming Project 3: Semantic Analysis
+----------------------------------------
 
-Homepage: http://github.com/dunecn/cs143-pp2
+Homepage: http://github.com/dunecn/cs143-pp3
 
 Author: Prakash Surya <surya1@llnl.gov>
 
 Goal:
 
 In the third programming project your job is to implement a semantic analyzer
-for your compiler. We're now at the penulimate phase of the front end. If we
+for your compiler. We're now at the penultimate phase of the front end. If we
 confirm the source program is free from compile-time errors, we're ready to
 generate code!
 
 Design Decisions:
 
-The existing inheritance structure of the AST nodes was utilized through
-virtual functions and polymorphism. Each node contains it's own method to check
-itself and add it's symbols into scope. This allows for the Program to simply
-loop through it's list of declarations, having each manage its own node
-specific check routines.
+The semantic analyzer was implemented with essentially two phases. The first
+phase gathers all of the declarations into a tree like data structure, and the
+second phase goes through and checks each node for typing and scope issues.
+Without the two separate phases, all classes, function, interfaces, etc. would
+have to be declared before they are used.
 
-The symbol table is completely maintained as a list of Scopes by the Program
-class. This allows for new scopes to easily be created, appended, and removed
-dynamically.
+The first phase of the analyzer is implemented almost solely using each class's
+BuildScope method. This method creates a new scope for each declaration, adds
+the required declarations to the scope, and sets up this new scope's parent
+scope pointer. The pointer to the parent scope allows the analyzer to travel up
+the scope hierarchy when it is searching for declarations and the like.
 
-The Program class also maintains a list of valid types. As variable
-declarations are encountered, this list of types is consulted to ensure the
-declarations type is valid.
+The second phase of the analyzer is implemented using each class's Check
+method. For each declaration, this method will in turn call each sub
+declaration's and sub statement's Check method. It will also do any node
+specific checking to ensure type correctness and ensure statements are well
+formed.
+
+Polymorphism and Inheritance were utilized to try and make the implementation
+clean and extensible. Although, as unexpected issue arose, the code quickly
+became more spaghetti like than one would prefer. Thus, due to the poor initial
+design, many ugly hacks were introduced to get the test cases to pass.
 
 Building:
 
