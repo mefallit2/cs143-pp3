@@ -174,9 +174,25 @@ void ClassDecl::CheckImplementsInterfaces() {
 
         for (int i = 0, n = intMembers->NumElements(); i < n; ++i) {
             Decl *d = intMembers->Nth(i);
-            Decl *lookup = scope->table->Lookup(d->Name());
 
-            if (lookup == NULL) {
+            ClassDecl *classDecl = this;
+            Decl *classLookup;
+            while (classDecl != NULL) {
+                classLookup = classDecl->GetScope()->table->Lookup(d->Name());
+
+                if (classLookup != NULL)
+                    break;
+
+                if (classDecl->GetExtends() == NULL) {
+                    classDecl == NULL;
+                } else {
+                    const char *extName = classDecl->GetExtends()->Name();
+                    Decl *ext = Program::gScope->table->Lookup(extName);
+                    classDecl = dynamic_cast<ClassDecl*>(ext);
+                }
+            }
+
+            if (classLookup == NULL) {
                 ReportError::InterfaceNotImplemented(this, nth);
                 return;
             }
