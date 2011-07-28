@@ -53,7 +53,11 @@ void VarDecl::CheckType() {
     while (s != NULL) {
         Decl *d;
         if ((d = s->table->Lookup(type->Name())) != NULL) {
-            if (dynamic_cast<ClassDecl*>(d) == NULL)
+            /* TODO: Do not let VarDecl's to be of an Interface type except
+             * when in that Interfaces scope.
+             */
+            if (dynamic_cast<ClassDecl*>(d) == NULL &&
+                dynamic_cast<InterfaceDecl*>(d) == NULL)
                 type->ReportNotDeclaredIdentifier(LookingForType);
 
             return;
