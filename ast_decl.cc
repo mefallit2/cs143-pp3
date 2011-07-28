@@ -90,6 +90,7 @@ void ClassDecl::Check() {
         CheckImplementedMembers(implements->Nth(i));
 
     CheckExtendedMembers(extends);
+    CheckImplementsInterfaces();
 }
 
 void ClassDecl::CheckExtends() {
@@ -150,6 +151,31 @@ void ClassDecl::CheckAgainstScope(Scope *other) {
         if (dynamic_cast<FnDecl*>(lookup) != NULL &&
             !d->IsEquivalentTo(lookup))
             ReportError::OverrideMismatch(d);
+    }
+}
+
+void ClassDecl::CheckImplementsInterfaces() {
+    Scope *s = scope->GetParent();
+
+    for (int i = 0, n = implements->NumElements(); i < n; ++i) {
+        NamedType *nth = implements->Nth(i);
+        Decl *lookup = s->table->Lookup(implements->Nth(i)->Name());
+        InterfaceDecl *intDecl = dynamic_cast<InterfaceDecl*>(lookup);
+
+        if (intDecl == NULL)
+            continue;
+
+        List<Decl*> *intMembers = intDecl->GetMembers();
+
+        for (int i = 0, n = intMembers->NumElements(); i < n; ++i) {
+            Decl *d = intMembers->Nth(i);
+            Decl *lookup = scope->table->Lookup(d->Name());
+
+            if (lookup == NULL) {
+                ReportError::InterfaceNotImplemented(this, nth);
+                return;
+            }
+        }
     }
 }
 

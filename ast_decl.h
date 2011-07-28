@@ -84,6 +84,7 @@ class ClassDecl : public Decl
     void CheckExtendedMembers(NamedType *extType);
     void CheckImplementedMembers(NamedType *impType);
     void CheckAgainstScope(Scope *other);
+    void CheckImplementsInterfaces();
 };
 
 class InterfaceDecl : public Decl
@@ -95,6 +96,8 @@ class InterfaceDecl : public Decl
     InterfaceDecl(Identifier *name, List<Decl*> *members);
 
     void BuildScope(Scope *parent);
+
+    List<Decl*>* GetMembers() { return members; }
 };
 
 class FnDecl : public Decl
