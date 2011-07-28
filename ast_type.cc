@@ -67,7 +67,7 @@ bool NamedType::IsEquivalentTo(Type *other) {
         if (c == NULL)
             return false;
 
-        NamedType *nType = c->GetExtends();
+        nType = c->GetExtends();
         if (nType == NULL)
             break;
 
