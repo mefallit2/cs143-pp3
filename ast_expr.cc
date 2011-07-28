@@ -580,4 +580,11 @@ void NewArrayExpr::Check() {
 
     if (!size->GetType()->IsEqualTo(Type::intType))
         ReportError::NewArraySizeNotInteger(size);
+
+    if (elemType->IsPrimitive() && !elemType->IsEquivalentTo(Type::voidType))
+        return;
+
+    Decl *d = Program::gScope->table->Lookup(elemType->Name());
+    if (dynamic_cast<ClassDecl*>(d) == NULL)
+        elemType->ReportNotDeclaredIdentifier(LookingForType);
 }
