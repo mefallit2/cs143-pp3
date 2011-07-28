@@ -588,3 +588,11 @@ void NewArrayExpr::Check() {
     if (dynamic_cast<ClassDecl*>(d) == NULL)
         elemType->ReportNotDeclaredIdentifier(LookingForType);
 }
+
+Type* ReadIntegerExpr::GetType() {
+    return Type::intType;
+}
+
+Type* ReadLineExpr::GetType() {
+    return Type::stringType;
+}
