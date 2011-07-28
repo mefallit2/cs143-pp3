@@ -97,6 +97,7 @@ class InterfaceDecl : public Decl
 
     void BuildScope(Scope *parent);
 
+    Type* GetType() { return new NamedType(id); }
     List<Decl*>* GetMembers() { return members; }
 };
 

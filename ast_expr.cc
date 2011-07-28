@@ -32,6 +32,7 @@ Decl* Expr::GetFieldDecl(Identifier *f, Type *b) {
     while (t != NULL) {
         Decl *d = Program::gScope->table->Lookup(t->Name());
         ClassDecl *c = dynamic_cast<ClassDecl*>(d);
+        InterfaceDecl *i = dynamic_cast<InterfaceDecl*>(d);
 
         Decl *fieldDecl;
         if (c != NULL) {
@@ -39,6 +40,11 @@ Decl* Expr::GetFieldDecl(Identifier *f, Type *b) {
                 return fieldDecl;
             else
                 t = c->GetExtends();
+        } else if (i != NULL) {
+            if ((fieldDecl = GetFieldDecl(f, i->GetScope())) != NULL)
+                return fieldDecl;
+            else
+                t = NULL;
         } else {
             t = NULL;
         }
