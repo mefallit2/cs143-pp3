@@ -22,12 +22,6 @@ void Decl::BuildScope(Scope *parent) {
     scope->SetParent(parent);
 }
 
-void Decl::Check() {
-    /* TODO: Once all subclasses support this function it should be made a pure
-     * virtual function.
-     */
-}
-
 VarDecl::VarDecl(Identifier *n, Type *t) : Decl(n) {
     Assert(n != NULL && t != NULL);
     (type=t)->SetParent(this);
@@ -217,6 +211,11 @@ void InterfaceDecl::BuildScope(Scope *parent) {
 
     for (int i = 0, n = members->NumElements(); i < n; ++i)
         members->Nth(i)->BuildScope(scope);
+}
+
+void InterfaceDecl::Check() {
+    for (int i = 0, n = members->NumElements(); i < n; ++i)
+        members->Nth(i)->Check();
 }
 
 FnDecl::FnDecl(Identifier *n, Type *r, List<VarDecl*> *d) : Decl(n) {

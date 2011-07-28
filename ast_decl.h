@@ -40,7 +40,7 @@ class Decl : public Node
     Scope* GetScope() { return scope; }
 
     virtual void BuildScope(Scope *parent);
-    virtual void Check();
+    virtual void Check() = 0;
 };
 
 class VarDecl : public Decl
@@ -97,6 +97,7 @@ class InterfaceDecl : public Decl
     InterfaceDecl(Identifier *name, List<Decl*> *members);
 
     void BuildScope(Scope *parent);
+    void Check();
 
     Type* GetType() { return new NamedType(id); }
     List<Decl*>* GetMembers() { return members; }
