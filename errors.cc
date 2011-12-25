@@ -11,10 +11,6 @@
 #include <stdio.h>
 using namespace std;
 #include "scanner.h" // for GetLineNumbered
-#include "ast_type.h"
-#include "ast_expr.h"
-#include "ast_stmt.h"
-#include "ast_decl.h"
 
 
 int ReportError::numErrors = 0;
@@ -72,107 +68,6 @@ void ReportError::UnrecogChar(yyltype *loc, char ch) {
     ostringstream s;
     s << "Unrecognized char: '" << ch << "'";
     OutputError(loc, s.str());
-}
-
-void ReportError::DeclConflict(Decl *decl, Decl *prevDecl) {
-    ostringstream s;
-    s << "Declaration of '" << decl << "' here conflicts with declaration on line " 
-      << prevDecl->GetLocation()->first_line;
-    OutputError(decl->GetLocation(), s.str());
-}
-  
-void ReportError::OverrideMismatch(Decl *fnDecl) {
-    ostringstream s;
-    s << "Method '" << fnDecl << "' must match inherited type signature";
-    OutputError(fnDecl->GetLocation(), s.str());
-}
-
-void ReportError::InterfaceNotImplemented(Decl *cd, Type *interfaceType) {
-    ostringstream s;
-    s << "Class '" << cd << "' does not implement entire interface '" << interfaceType << "'";
-    OutputError(interfaceType->GetLocation(), s.str());
-}
-
-void ReportError::IdentifierNotDeclared(Identifier *ident, reasonT whyNeeded) {
-    ostringstream s;
-    static const char *names[] =  {"type", "class", "interface", "variable", "function"};
-    Assert(whyNeeded >= 0 && whyNeeded <= sizeof(names)/sizeof(names[0]));
-    s << "No declaration found for "<< names[whyNeeded] << " '" << ident << "'";
-    OutputError(ident->GetLocation(), s.str());
-}
-
-void ReportError::IncompatibleOperands(Operator *op, Type *lhs, Type *rhs) {
-    ostringstream s;
-    s << "Incompatible operands: " << lhs << " " << op << " " << rhs;
-    OutputError(op->GetLocation(), s.str());
-}
-     
-void ReportError::IncompatibleOperand(Operator *op, Type *rhs) {
-    ostringstream s;
-    s << "Incompatible operand: " << op << " " << rhs;
-    OutputError(op->GetLocation(), s.str());
-}
-
-void ReportError::ThisOutsideClassScope(This *th) {
-    OutputError(th->GetLocation(), "'this' is only valid within class scope");
-}
-
-void ReportError::BracketsOnNonArray(Expr *baseExpr) {
-    OutputError(baseExpr->GetLocation(), "[] can only be applied to arrays");
-}
-
-void ReportError::SubscriptNotInteger(Expr *subscriptExpr) {
-    OutputError(subscriptExpr->GetLocation(), "Array subscript must be an integer");
-}
-
-void ReportError::NewArraySizeNotInteger(Expr *sizeExpr) {
-    OutputError(sizeExpr->GetLocation(), "Size for NewArray must be an integer");
-}
-
-void ReportError::NumArgsMismatch(Identifier *fnIdent, int numExpected, int numGiven) {
-    ostringstream s;
-    s << "Function '"<< fnIdent << "' expects " << numExpected << " argument" << (numExpected==1?"":"s") 
-      << " but " << numGiven << " given";
-    OutputError(fnIdent->GetLocation(), s.str());
-}
-
-void ReportError::ArgMismatch(Expr *arg, int argIndex, Type *given, Type *expected) {
-  ostringstream s;
-  s << "Incompatible argument " << argIndex << ": " << given << " given, " << expected << " expected";
-  OutputError(arg->GetLocation(), s.str());
-}
-
-void ReportError::ReturnMismatch(ReturnStmt *rStmt, Type *given, Type *expected) {
-    ostringstream s;
-    s << "Incompatible return: " << given << " given, " << expected << " expected";
-    OutputError(rStmt->GetLocation(), s.str());
-}
-
-void ReportError::FieldNotFoundInBase(Identifier *field, Type *base) {
-    ostringstream s;
-    s << base << " has no such field '" << field <<"'";
-    OutputError(field->GetLocation(), s.str());
-}
-     
-void ReportError::InaccessibleField(Identifier *field, Type *base) {
-    ostringstream s;
-    s  << base << " field '" << field << "' only accessible within class scope";
-    OutputError(field->GetLocation(), s.str());
-}
-
-void ReportError::PrintArgMismatch(Expr *arg, int argIndex, Type *given) {
-    ostringstream s;
-    s << "Incompatible argument " << argIndex << ": " << given
-        << " given, int/bool/string expected";
-    OutputError(arg->GetLocation(), s.str());
-}
-
-void ReportError::TestNotBoolean(Expr *expr) {
-    OutputError(expr->GetLocation(), "Test expression must have boolean type");
-}
-
-void ReportError::BreakOutsideLoop(BreakStmt *bStmt) {
-    OutputError(bStmt->GetLocation(), "break is only allowed inside a loop");
 }
   
 /**

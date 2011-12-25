@@ -1,34 +1,34 @@
 /* File: hashtable.h
- * -----------------
- * This is a simple table for storing values associated with a string
- * key, supporting simple operations for Enter and Lookup.  It is not
- * much more than a thin cover over the STL associative map container,
- * but hides the awkward C++ template syntax and provides a more
- * familiar interface.
- *
- * The keys are always strings, but the values can be of any type
- * (ok, that's actually kind of a fib, it expects the type to be
- * some sort of pointer to conform to using NULL for "not found").
- * The typename for a Hashtable includes the value type in angle
- * brackets, e.g.  if the table is storing  char *as values, you
- * would use the type name Hashtable<char*>. If storing values
- * that are of type Decl*, it would be Hashtable<Decl*>.
- * The same notation is used on the matching iterator for the table,
- * i.e. a Hashtable<char*> supports an Iterator<char*>.
- *
- * An iterator is provided for iterating over the entries in a table. 
- * The iterator walks through the values, one by one, in alphabetical
- * order by the key. Sample iteration usage:
- *
- *       void PrintNames(Hashtable<Decl*> *table)
- *       {
- *          Iterator<Decl*> iter = table->GetIterator();
- *          Decl *decl;
- *          while ((decl = iter.GetNextValue()) != NULL) {
- *               printf("%s\n", decl->GetName());
- *          }
- *       }
- */
+* -----------------
+* This is a simple table for storing values associated with a string
+* key, supporting simple operations for Enter and Lookup. It is not
+* much more than a thin cover over the STL associative map container,
+* but hides the awkward C++ template syntax and provides a more
+* familiar interface.
+*
+* The keys are always strings, but the values can be of any type
+* (ok, that's actually kind of a fib, it expects the type to be
+* some sort of pointer to conform to using NULL for "not found").
+* The typename for a Hashtable includes the value type in angle
+* brackets, e.g. if the table is storing char *as values, you
+* would use the type name Hashtable<char*>. If storing values
+* that are of type Decl*, it would be Hashtable<Decl*>.
+* The same notation is used on the matching iterator for the table,
+* i.e. a Hashtable<char*> supports an Iterator<char*>.
+*
+* An iterator is provided for iterating over the entries in a table.
+* The iterator walks through the values, one by one, in alphabetical
+* order by the key. Sample iteration usage:
+*
+* void PrintNames(Hashtable<Decl*> *table)
+* {
+* Iterator<Decl*> iter = table->GetIterator();
+* Decl *decl;
+* while ((decl = iter.GetNextValue()) != NULL) {
+* printf("%s\n", decl->GetName());
+* }
+* }
+*/
 
 #ifndef _H_hashtable
 #define _H_hashtable
@@ -43,11 +43,11 @@ struct ltstr {
 };
 
 
-template <class Value> class Iterator; 
+template <class Value> class Iterator;
  
 template<class Value> class Hashtable {
 
-  private: 
+  private:
      multimap<const char*, Value, ltstr> mmap;
  
    public:
@@ -58,15 +58,15 @@ template<class Value> class Hashtable {
      int NumEntries() const;
 
            // Associates value with key. If a previous entry for
-           // key exists, the bool parameter controls whether 
+           // key exists, the bool parameter controls whether
            // new value overwrites the previous (removing it from
            // from the table entirely) or just shadows it (keeps previous
            // and adds additional entry). The lastmost entered one for an
            // key will be the one returned by Lookup.
      void Enter(const char *key, Value value,
-		    bool overwriteInsteadOfShadow = true);
+bool overwriteInsteadOfShadow = true);
 
-           // Removes a given key->value pair.  Any other values
+           // Removes a given key->value pair. Any other values
            // for that key are not affected. If this is the last
            // remaining value for that key, the key is removed
            // entirely.
@@ -85,10 +85,10 @@ template<class Value> class Hashtable {
 
 
 /* Don't worry too much about how the Iterator is implemented, see
- * sample usage above for how to iterate over a hashtable using an
- * iterator.
- */
-template <class Value> 
+* sample usage above for how to iterate over a hashtable using an
+* iterator.
+*/
+template <class Value>
 class Iterator {
 
   friend class Hashtable<Value>;
@@ -96,8 +96,8 @@ class Iterator {
   private:
     typename multimap<const char*, Value , ltstr>::iterator cur, end;
     Iterator(multimap<const char*, Value, ltstr>& t)
-	: cur(t.begin()), end(t.end()) {}
-	 
+: cur(t.begin()), end(t.end()) {}
+
   public:
          // Returns current value and advances iterator to next.
          // Returns NULL when there are no more values in table
@@ -109,4 +109,5 @@ class Iterator {
 #include "hashtable.cc" // icky, but allows implicit template instantiation
 
 #endif
+
 

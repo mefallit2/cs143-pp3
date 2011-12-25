@@ -1,6 +1,6 @@
 /* File:  scanner.l
  * ----------------
- * Lex input file to generate the scanner for the compiler.
+ * Lex inupt file to generate the scanner for the compiler.
  */
 
 %{
@@ -84,21 +84,17 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "void"              { return T_Void;        }
 "int"               { return T_Int;         }
 "double"            { return T_Double;      }
-"bool"              { return T_Bool;        }
 "string"            { return T_String;      }
 "null"              { return T_Null;        }
 "class"             { return T_Class;       }
-"extends"           { return T_Extends;     }
 "this"              { return T_This;        }
-"interface"         { return T_Interface;   }
-"implements"        { return T_Implements;  }
 "while"             { return T_While;       }
 "for"               { return T_For;         }
 "if"                { return T_If;          }
 "else"              { return T_Else;        }
 "return"            { return T_Return;      }
 "break"             { return T_Break;       }
-"new"               { return T_New;         }
+"New"               { return T_New;         }
 "NewArray"          { return T_NewArray;    }
 "Print"             { return T_Print;       }
 "ReadInteger"       { return T_ReadInteger; }
@@ -113,12 +109,9 @@ SINGLE_COMMENT    ("//"[^\n]*)
 "!="                { return T_NotEqual;    }
 "&&"                { return T_And;         }
 "||"                { return T_Or;          }
-"[]"                { return T_Dims;        }
 {OPERATOR}          { return yytext[0];     }
 
  /* -------------------- Constants ------------------------------ */
-"true"|"false"      { yylval.boolConstant = (yytext[0] == 't');
-                         return T_BoolConstant; }
 {INTEGER}           { yylval.integerConstant = strtol(yytext, NULL, 10);
                          return T_IntConstant; }
 {HEX_INTEGER}       { yylval.integerConstant = strtol(yytext, NULL, 16);
